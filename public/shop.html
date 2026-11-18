@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop The Archive | MONROE CLOSET STUDIO</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Minimal Header -->
+  <header class="studio-header" id="header">
+    <div class="header-container">
+      
+      <!-- Mobile Burger -->
+      <button class="burger-btn" id="burger-menu" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="3" y1="7" x2="21" y2="7"/>
+          <line x1="3" y1="17" x2="21" y2="17"/>
+        </svg>
+      </button>
+
+      <!-- Desktop Navigation with Immediate Hover Dropdown -->
+      <nav class="nav-left" aria-label="Primary">
+        <ul class="nav-links">
+          
+          <!-- SHOP -->
+          <li class="nav-item has-dropdown">
+            <a href="shop.html" class="nav-anchor" style="border-bottom: 1.5px solid var(--text-main);">Shop</a>
+            
+            <div class="dropdown-panel mega-panel">
+              <div class="dropdown-inner">
+                
+                <!-- Clothing Column with 8 Subsections -->
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Clothing" class="col-heading">Clothing</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Clothing&sub=Outerwear">Outerwear</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Blazers">Blazers</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Dresses">Dresses</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Tops%2F%20T-shirts">Tops/ T-shirts</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Shirts%2F%20Blouses">Shirts/ Blouses</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Pants">Pants</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Jeans">Jeans</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Skirts">Skirts</a></li>
+                  </ul>
+                </div>
+
+                <!-- Bags Column -->
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Bags" class="col-heading">Bags</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Bags">All Handbags</a></li>
+                    <li><a href="shop.html?category=Bags">Shoulder & Crossbody</a></li>
+                    <li><a href="shop.html?category=Bags">Totes</a></li>
+                    <li><a href="shop.html?category=Bags">Clutches</a></li>
+                  </ul>
+                </div>
+
+                <!-- Shoes Column -->
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Shoes" class="col-heading">Shoes</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Shoes">All Shoes</a></li>
+                    <li><a href="shop.html?category=Shoes">Heels & Pumps</a></li>
+                    <li><a href="shop.html?category=Shoes">Flats & Loafers</a></li>
+                    <li><a href="shop.html?category=Shoes">Boots & Sandals</a></li>
+                  </ul>
+                </div>
+
+                <!-- Accessories Column -->
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Accessories%20%2F%20jewelry" class="col-heading">Accessories / jewelry</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">All Accessories</a></li>
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">Fine Jewelry</a></li>
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">Timepieces</a></li>
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">Scarves & Belts</a></li>
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+          </li>
+
+          <!-- CLOTHING RENTAL -->
+          <li class="nav-item has-dropdown">
+            <a href="rental.html" class="nav-anchor">Clothing rental</a>
+            <div class="dropdown-panel simple-panel">
+              <ul class="simple-links">
+                <li><a href="rental.html">How Rental Works</a></li>
+                <li><a href="rental.html#collection">Rental Archive Lookbook</a></li>
+                <li><a href="rental.html#booking">Book a Private Fitting</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <!-- PERSONAL SHOPPING AND STYLING -->
+          <li class="nav-item has-dropdown">
+            <a href="styling.html" class="nav-anchor">Personal shopping and styling</a>
+            <div class="dropdown-panel simple-panel">
+              <ul class="simple-links">
+                <li><a href="styling.html">Bespoke Styling Services</a></li>
+                <li><a href="styling.html#sourcing">Rare Holy-Grail Sourcing</a></li>
+                <li><a href="styling.html#inquire">Schedule Consultation</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <!-- ABOUT US -->
+          <li class="nav-item has-dropdown">
+            <a href="about.html" class="nav-anchor">About us</a>
+            <div class="dropdown-panel simple-panel">
+              <ul class="simple-links">
+                <li><a href="about.html">Monroe Studio Story</a></li>
+                <li><a href="about.html#consignment">Consign With Us</a></li>
+                <li><a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener">Instagram (@monroecloset.studio)</a></li>
+              </ul>
+            </div>
+          </li>
+
+        </ul>
+      </nav>
+
+      <!-- Center Logo -->
+      <a href="index.html" class="brand-logo">
+        <img src="img/monroe-logo.png" alt="Monroe Logo" class="logo-mark" onerror="this.style.display='none'">
+        <span class="logo-title">MONROE</span>
+      </a>
+
+      <!-- Right Controls -->
+      <div class="nav-right">
+        <button class="icon-btn" id="search-btn" aria-label="Search">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="11" cy="11" r="7.5"/>
+            <path d="m20 20-3.8-3.8"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn bag-btn" id="cart-btn" aria-label="Shopping Bag">
+          <span class="bag-label">Bag</span>
+          <span class="bag-count" id="cart-count">0</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- SEARCH DRAWER OVERLAY -->
+  <div class="search-drawer" id="search-modal">
+    <div class="search-drawer-inner">
+      <div class="search-top">
+        <input type="text" id="live-search-input" placeholder="Search archive (e.g. Chanel, Blazer, Hermès, Dress)..." autocomplete="off">
+        <button class="close-search-btn" id="close-search-btn" aria-label="Close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER BAG (SIDE CART) -->
+  <div class="cart-overlay" id="cart-drawer-backdrop">
+    <div class="cart-panel" id="cart-drawer">
+      <div class="cart-header">
+        <span class="cart-title">Shopping Bag (<span id="cart-drawer-count">0</span>)</span>
+        <button class="cart-close" id="close-cart-btn" aria-label="Close bag">✕</button>
+      </div>
+      <div class="cart-body" id="cart-items-container"></div>
+      <div class="cart-footer">
+        <div class="cart-total-line">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">$0</span>
+        </div>
+        <button class="checkout-button" id="checkout-btn">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div class="mobile-drawer-overlay" id="mobile-nav-backdrop">
+    <div class="mobile-drawer" id="mobile-nav-drawer">
+      <div class="mobile-top">
+        <span class="mobile-brand">MONROE</span>
+        <button class="mobile-close" id="close-mobile-nav-btn" aria-label="Close menu">✕</button>
+      </div>
+      <div class="mobile-menu-body">
+        
+        <div class="mobile-accordion">
+          <button class="mobile-acc-header" id="mobile-shop-btn">
+            <span>Shop</span>
+            <span class="acc-arrow">+</span>
+          </button>
+          <div class="mobile-acc-panel" id="mobile-shop-content">
+            <div class="mobile-nested">
+              <button class="mobile-sub-acc-header" id="mobile-clothing-btn">
+                <span>Clothing</span>
+                <span class="acc-arrow">+</span>
+              </button>
+              <div class="mobile-sub-panel" id="mobile-clothing-content">
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Outerwear')">Outerwear</a>
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Blazers')">Blazers</a>
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Dresses')">Dresses</a>
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Tops/ T-shirts')">Tops/ T-shirts</a>
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Shirts/ Blouses')">Shirts/ Blouses</a>
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Pants')">Pants</a>
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Jeans')">Jeans</a>
+                <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Clothing', 'Skirts')">Skirts</a>
+              </div>
+            </div>
+            <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Bags')" class="mobile-plain-link">Bags</a>
+            <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Shoes')" class="mobile-plain-link">Shoes</a>
+            <a href="javascript:void(0)" onclick="closeMobileDrawer(); filterShopBy('Accessories / jewelry')" class="mobile-plain-link">Accessories / jewelry</a>
+          </div>
+        </div>
+
+        <a href="rental.html" class="mobile-root-link">Clothing rental</a>
+        <a href="styling.html" class="mobile-root-link">Personal shopping and styling</a>
+        <a href="about.html" class="mobile-root-link">About us</a>
+
+        <div class="mobile-social">
+          <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener">@monroecloset.studio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOP MAIN CATALOG CONTAINER -->
+  <main class="catalog-area">
+    <div class="container">
+      
+      <!-- Catalog Header & Minimalist Filters -->
+      <header class="shop-page-header">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 20px;">
+          <h1 class="shop-page-heading" id="shop-heading" style="margin-bottom:0;">The Archive Collection</h1>
+          <span id="shop-items-count" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"></span>
+        </div>
+        
+        <div class="shop-filter-bar">
+          <!-- Primary Category Tabs -->
+          <div class="shop-category-tabs">
+            <button class="shop-cat-btn active" data-cat="All">All Pieces</button>
+            <button class="shop-cat-btn" data-cat="Clothing">Clothing</button>
+            <button class="shop-cat-btn" data-cat="Bags">Bags</button>
+            <button class="shop-cat-btn" data-cat="Shoes">Shoes</button>
+            <button class="shop-cat-btn" data-cat="Accessories / jewelry">Accessories / jewelry</button>
+          </div>
+
+          <!-- Secondary Filters (Brand, Sort, Reset) -->
+          <div class="shop-controls-right">
+            <select id="shop-filter-brand" class="shop-select" aria-label="Filter by Designer">
+              <option value="All">All Designers</option>
+              <option value="CHANEL">Chanel</option>
+              <option value="HERMÈS">Hermès</option>
+              <option value="LOUIS VUITTON">Louis Vuitton</option>
+              <option value="DIOR">Dior</option>
+              <option value="BALMAIN">Balmain</option>
+              <option value="SAINT LAURENT">Saint Laurent</option>
+              <option value="THE ROW">The Row</option>
+              <option value="PRADA">Prada</option>
+              <option value="LOEWE">Loewe</option>
+              <option value="MAX MARA">Max Mara</option>
+              <option value="CARTIER">Cartier</option>
+            </select>
+
+            <select id="shop-filter-sort" class="shop-select" aria-label="Sort pieces">
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+
+            <button id="shop-reset-btn" class="shop-reset-link">Reset</button>
+          </div>
+        </div>
+
+        <!-- Subcategories bar for Clothing (Outerwear, Blazers, Dresses, etc.) -->
+        <div class="shop-subcategories-bar" id="shop-subcategories-bar" style="display:none;">
+          <button class="shop-sub-btn active" data-sub="All">All Clothing</button>
+          <button class="shop-sub-btn" data-sub="Outerwear">Outerwear</button>
+          <button class="shop-sub-btn" data-sub="Blazers">Blazers</button>
+          <button class="shop-sub-btn" data-sub="Dresses">Dresses</button>
+          <button class="shop-sub-btn" data-sub="Tops/ T-shirts">Tops/ T-shirts</button>
+          <button class="shop-sub-btn" data-sub="Shirts/ Blouses">Shirts/ Blouses</button>
+          <button class="shop-sub-btn" data-sub="Pants">Pants</button>
+          <button class="shop-sub-btn" data-sub="Jeans">Jeans</button>
+          <button class="shop-sub-btn" data-sub="Skirts">Skirts</button>
+        </div>
+      </header>
+
+      <!-- Products Grid -->
+      <div class="minimal-grid" id="catalog-products-grid">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="catalog-empty-view" style="display:none; text-align:center; padding: 80px 0;">
+        <p style="color: var(--text-muted); font-size: 1rem;">No matching archival pieces found.</p>
+        <button onclick="filterShopBy('All')" style="margin-top: 12px; text-decoration: underline; font-size: 0.85rem;">View all pieces</button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MINIMAL FOOTER -->
+  <footer class="minimal-footer">
+    <div class="container">
+      <div class="footer-row">
+        <span>© 2026 MONROE CLOSET STUDIO</span>
+        <div class="footer-nav">
+          <a href="shop.html">Shop</a>
+          <a href="rental.html">Clothing rental</a>
+          <a href="styling.html">Styling</a>
+          <a href="about.html">About us</a>
+          <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-wrap" id="toast-container"></div>
+
+  <!-- Shared Data & Scripts -->
+  <script src="products-data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
