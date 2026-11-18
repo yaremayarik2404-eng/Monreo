@@ -487,6 +487,13 @@ button {
   margin-top: 4px;
 }
 
+.rental-card{
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 40px; 
+  text-align: left;
+}
+
 .product-action-stack {
   display: flex;
   flex-direction: column;
@@ -845,6 +852,7 @@ button {
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
+
 
 /* --------------------------------------------------------------------------
    Side Cart Drawer
@@ -1226,4 +1234,6 @@ button {
   .footer-row { flex-direction: column; align-items: flex-start; }
   .product-headline { font-size: 1.8rem; }
   .shop-filter-bar { flex-direction: column; align-items: flex-start; }
+  .rental-card{grid-template-columns:  1fr; }
 }
+
