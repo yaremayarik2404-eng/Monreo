@@ -4,6 +4,40 @@
  */
 
 // =============================================================================
+// 0. DATA ACCESS HELPERS & CURRENCY FORMATTING
+// =============================================================================
+
+function getStudioProducts() {
+  if (typeof window.getProductItems === "function") {
+    return window.getProductItems();
+  }
+  if (Array.isArray(window.MONROE_PRODUCTS)) {
+    if (window.MONROE_PRODUCTS.length > 0 && Array.isArray(window.MONROE_PRODUCTS[0]?.items)) {
+      return window.MONROE_PRODUCTS[0].items;
+    }
+    return window.MONROE_PRODUCTS;
+  }
+  return [];
+}
+
+function getCurrencySymbol() {
+  const cur = (Array.isArray(window.MONROE_PRODUCTS) && window.MONROE_PRODUCTS[0]?.currency) || "UAH";
+  if (cur === "UAH") return " ₴";
+  if (cur === "USD") return "$";
+  if (cur === "EUR") return "€";
+  return ` ${cur}`;
+}
+
+function formatPrice(amount) {
+  const sym = getCurrencySymbol();
+  const num = Number(amount) || 0;
+  if (sym.startsWith(" ")) {
+    return `${num.toLocaleString()}${sym}`;
+  }
+  return `${sym}${num.toLocaleString()}`;
+}
+
+// =============================================================================
 // 1. PERSISTENT CART STATE (Synchronized via LocalStorage)
 // =============================================================================
 
@@ -41,7 +75,9 @@ function closeCartDrawer() {
 }
 
 function addToCart(productId, qty = 1) {
-  const product = typeof window.getProductById === "function" ? window.getProductById(productId) : MONROE_PRODUCTS.find(p => p.id === productId);
+  const product = typeof window.getProductById === "function"
+    ? window.getProductById(productId)
+    : getStudioProducts().find(p => p.id === productId);
   if (!product) return;
 
   const existing = studioCart.find(i => i.id === productId);
@@ -53,7 +89,7 @@ function addToCart(productId, qty = 1) {
       brand: product.brand,
       title: product.title,
       price: product.price,
-      image: product.images[0],
+      image: (product.images && product.images[0]) || "img/monroe-logo.png",
       quantity: qty
     });
   }
@@ -93,7 +129,7 @@ function renderCartDrawer() {
 
   if (countBadge) countBadge.textContent = totalItems;
   if (drawerCount) drawerCount.textContent = totalItems;
-  if (subtotalEl) subtotalEl.textContent = "$" + totalAmount.toLocaleString();
+  if (subtotalEl) subtotalEl.textContent = formatPrice(totalAmount);
 
   if (!container) return;
 
@@ -115,7 +151,7 @@ function renderCartDrawer() {
           <span class="cart-item-brand">${item.brand}</span>
           <h4 class="cart-item-name">${item.title}</h4>
         </div>
-        <div class="cart-item-price">$${(item.price * item.quantity).toLocaleString()}</div>
+        <div class="cart-item-price">${formatPrice(item.price * item.quantity)}</div>
         <div class="cart-stepper">
           <button onclick="updateCartQty('${item.id}', -1)" aria-label="Decrease">−</button>
           <span>${item.quantity}</span>
@@ -133,8 +169,8 @@ window.addCustomProduct = function(item) {
     id: item.id || "m-custom-" + Date.now(),
     brand: (item.brand || "DESIGNER").toUpperCase(),
     title: item.title || "Curated Piece",
-    category: item.category || "Clothing",
-    subcategory: item.subcategory || "Outerwear",
+    category: item.category || "Women's Clothing",
+    subcategory: item.subcategory || "Blazers & Jackets",
     price: Number(item.price) || 1200,
     originalPrice: Number(item.originalPrice) || Number(item.price) * 1.3,
     condition: item.condition || "Pristine",
@@ -142,7 +178,7 @@ window.addCustomProduct = function(item) {
     rentalPrice: Number(item.rentalPrice) || 0,
     images: Array.isArray(item.images) && item.images.length > 0 
       ? item.images 
-      : [item.image || "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1200&q=85"],
+      : [item.image || "img/monroe-logo.png"],
     description: item.description || "Archival luxury piece.",
     details: item.details || {
       composition: "Pure Natural Fiber",
@@ -151,7 +187,8 @@ window.addCustomProduct = function(item) {
     }
   };
 
-  MONROE_PRODUCTS.unshift(newProduct);
+  const list = getStudioProducts();
+  list.unshift(newProduct);
   if (typeof renderShopCatalog === "function") renderShopCatalog();
   showToast(`Added: ${newProduct.title}`);
   return newProduct;
@@ -232,38 +269,81 @@ let activeShopFilters = {
   sortBy: "featured"
 };
 
+function matchesCategory(item, cat) {
+  if (!cat || cat === "All") return true;
+  const c = cat.toLowerCase();
+  const itemCat = (item.category || "").toLowerCase();
+  const itemSub = (item.subcategory || "").toLowerCase();
+
+  if (itemCat === c) return true;
+  if (c === "clothing" && (itemCat.includes("clothing") || itemCat.includes("clothes"))) return true;
+  if (c === "bags" && (itemCat.includes("bag") || itemSub.includes("bag"))) return true;
+  if (c === "shoes" && (itemCat.includes("shoe") || itemSub.includes("shoe") || itemSub.includes("sandals") || itemSub.includes("mules") || itemSub.includes("heels"))) return true;
+  if (c.includes("accessor") && (itemCat.includes("accessor") || itemSub.includes("earring") || itemSub.includes("jewelry") || itemSub.includes("sunglass") || itemSub.includes("glasses"))) return true;
+  if (c.includes("home") || c.includes("interior") || c.includes("decor")) {
+    return itemCat.includes("home") || itemCat.includes("interior") || itemSub.includes("decor");
+  }
+  return itemCat.includes(c) || itemSub.includes(c);
+}
+
+function matchesSubcategory(item, sub) {
+  if (!sub || sub === "All") return true;
+  const s = sub.toLowerCase();
+  const itemSub = (item.subcategory || "").toLowerCase();
+  return itemSub.includes(s);
+}
+
+function populateBrandFilter() {
+  const brandSelect = document.getElementById("shop-filter-brand");
+  if (!brandSelect) return;
+  const items = getStudioProducts();
+  const brands = [...new Set(items.map(i => i.brand).filter(Boolean))].sort();
+  const currentVal = activeShopFilters.brand;
+
+  brandSelect.innerHTML = `<option value="All">All Designers</option>` +
+    brands.map(b => `<option value="${b}">${b}</option>`).join("");
+
+  if (brands.some(b => b.toUpperCase() === currentVal.toUpperCase())) {
+    brandSelect.value = currentVal;
+  } else {
+    brandSelect.value = "All";
+  }
+}
+
 function renderShopCatalog() {
   const grid = document.getElementById("catalog-products-grid");
   const emptyView = document.getElementById("catalog-empty-view");
   if (!grid) return;
 
-  let list = [...MONROE_PRODUCTS];
+  populateBrandFilter();
+
+  let list = [...getStudioProducts()];
 
   // 1. Search Query
   if (activeShopFilters.searchQuery.trim() !== "") {
     const q = activeShopFilters.searchQuery.toLowerCase();
     list = list.filter(p => 
-      p.brand.toLowerCase().includes(q) ||
-      p.title.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      p.subcategory.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q)
+      (p.brand && p.brand.toLowerCase().includes(q)) ||
+      (p.title && p.title.toLowerCase().includes(q)) ||
+      (p.category && p.category.toLowerCase().includes(q)) ||
+      (p.subcategory && p.subcategory.toLowerCase().includes(q)) ||
+      (p.description && p.description.toLowerCase().includes(q))
     );
   }
 
   // 2. Category
   if (activeShopFilters.category !== "All") {
-    list = list.filter(p => p.category.toLowerCase() === activeShopFilters.category.toLowerCase());
+    list = list.filter(p => matchesCategory(p, activeShopFilters.category));
   }
 
   // 3. Subcategory
   if (activeShopFilters.subcategory !== "All") {
-    list = list.filter(p => p.subcategory.toLowerCase() === activeShopFilters.subcategory.toLowerCase());
+    list = list.filter(p => matchesSubcategory(p, activeShopFilters.subcategory));
   }
 
   // 4. Brand
   if (activeShopFilters.brand !== "All") {
-    list = list.filter(p => p.brand.toUpperCase() === activeShopFilters.brand.toUpperCase());
+    list = list.filter(p => (p.brand || "").toUpperCase() === activeShopFilters.brand.toUpperCase());
   }
 
   // 5. Sorting
@@ -283,21 +363,25 @@ function renderShopCatalog() {
 
   if (emptyView) emptyView.style.display = "none";
 
-  // Render product cards (Clicking an image or title goes to product.html?id=... with detailed descriptions!)
-  grid.innerHTML = list.map(item => `
-    <article class="product-card">
-      <a href="product.html?id=${item.id}" class="product-media" title="View ${item.title}">
-        <img src="${item.images[0]}" alt="${item.brand} ${item.title}" class="img-main" loading="lazy">
-        <img src="${item.images[1] || item.images[0]}" alt="${item.brand} ${item.title}" class="img-hover" loading="lazy">
-      </a>
-      <div class="product-meta">
-        <span class="meta-brand">${item.brand}</span>
-        <a href="product.html?id=${item.id}" class="meta-title">${item.title}</a>
-        <span class="meta-price">$${Number(item.price).toLocaleString()}</span>
-        <a href="product.html?id=${item.id}" class="view-details-link">View Details →</a>
-      </div>
-    </article>
-  `).join("");
+  // Render product cards
+  grid.innerHTML = list.map(item => {
+    const mainImg = (item.images && item.images[0]) || "img/monroe-logo.png";
+    const hoverImg = (item.images && item.images[1]) || mainImg;
+    return `
+      <article class="product-card">
+        <a href="product.html?id=${item.id}" class="product-media" title="View ${item.title}">
+          <img src="${mainImg}" alt="${item.brand} ${item.title}" class="img-main" loading="lazy">
+          <img src="${hoverImg}" alt="${item.brand} ${item.title}" class="img-hover" loading="lazy">
+        </a>
+        <div class="product-meta">
+          <span class="meta-brand">${item.brand}</span>
+          <a href="product.html?id=${item.id}" class="meta-title">${item.title}</a>
+          <span class="meta-price">${formatPrice(item.price)}</span>
+          <a href="product.html?id=${item.id}" class="view-details-link">View Details →</a>
+        </div>
+      </article>
+    `;
+  }).join("");
 
   updateShopControlsUI(list.length);
 }
@@ -312,7 +396,7 @@ function updateShopControlsUI(count) {
   // Clothing subcategory pills bar
   const subWrap = document.getElementById("shop-subcategories-bar");
   if (subWrap) {
-    if (activeShopFilters.category === "Clothing") {
+    if (activeShopFilters.category === "Clothing" || activeShopFilters.category.toLowerCase().includes("cloth")) {
       subWrap.style.display = "flex";
       document.querySelectorAll(".shop-sub-btn").forEach(btn => {
         const sub = btn.getAttribute("data-sub");
@@ -357,7 +441,9 @@ function initProductDetailPage() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
-  const product = getProductById(id);
+  const product = typeof window.getProductById === "function" 
+    ? window.getProductById(id) 
+    : getStudioProducts().find(p => p.id === id);
 
   if (!product) {
     container.innerHTML = `
@@ -372,7 +458,7 @@ function initProductDetailPage() {
   document.title = `${product.brand} — ${product.title} | MONROE CLOSET STUDIO`;
 
   const details = product.details || {};
-  const images = product.images || [];
+  const images = (product.images && product.images.length > 0) ? product.images : ["img/monroe-logo.png"];
 
   container.innerHTML = `
     <div class="container">
@@ -413,9 +499,9 @@ function initProductDetailPage() {
           <h1 class="product-headline">${product.title}</h1>
           
           <div class="product-price-row">
-            <span class="product-primary-price">$${Number(product.price).toLocaleString()}</span>
+            <span class="product-primary-price">${formatPrice(product.price)}</span>
             ${product.originalPrice > product.price ? `
-              <span class="product-orig-price">Retail: $${Number(product.originalPrice).toLocaleString()}</span>
+              <span class="product-orig-price">Retail: ${formatPrice(product.originalPrice)}</span>
             ` : ''}
             <span class="product-condition-tag">${product.condition}</span>
           </div>
@@ -443,7 +529,7 @@ function initProductDetailPage() {
           ${product.rentalAvailable ? `
             <div class="rental-option-notice">
               <strong>✨ Rental Available</strong>
-              <span>Available for 3-Day Rental at $${product.rentalPrice} CAD with eco dry-cleaning included.</span>
+              <span>Available for 3-Day Rental at ${formatPrice(product.rentalPrice)} with eco dry-cleaning included.</span>
               <a href="rental.html" class="rental-notice-link">View Rental Details →</a>
             </div>
           ` : ''}
@@ -451,7 +537,7 @@ function initProductDetailPage() {
           <!-- Actions -->
           <div class="product-action-stack">
             <button class="btn-add-bag" onclick="addToCart('${product.id}')">
-              Add to Shopping Bag — $${Number(product.price).toLocaleString()}
+              Add to Shopping Bag — ${formatPrice(product.price)}
             </button>
             <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener" class="btn-inquire">
               Inquire on Instagram (@monroecloset.studio)
@@ -472,19 +558,23 @@ function initProductDetailPage() {
       <section class="related-section">
         <h2 class="related-title">You May Also Admire</h2>
         <div class="minimal-grid">
-          ${MONROE_PRODUCTS.filter(p => p.id !== product.id).slice(0, 4).map(rel => `
-            <article class="product-card">
-              <a href="product.html?id=${rel.id}" class="product-media">
-                <img src="${rel.images[0]}" alt="${rel.title}" class="img-main">
-                <img src="${rel.images[1] || rel.images[0]}" alt="${rel.title}" class="img-hover">
-              </a>
-              <div class="product-meta">
-                <span class="meta-brand">${rel.brand}</span>
-                <a href="product.html?id=${rel.id}" class="meta-title">${rel.title}</a>
-                <span class="meta-price">$${Number(rel.price).toLocaleString()}</span>
-              </div>
-            </article>
-          `).join("")}
+          ${getStudioProducts().filter(p => p.id !== product.id).slice(0, 4).map(rel => {
+            const rMain = (rel.images && rel.images[0]) || "img/monroe-logo.png";
+            const rHov = (rel.images && rel.images[1]) || rMain;
+            return `
+              <article class="product-card">
+                <a href="product.html?id=${rel.id}" class="product-media">
+                  <img src="${rMain}" alt="${rel.title}" class="img-main">
+                  <img src="${rHov}" alt="${rel.title}" class="img-hover">
+                </a>
+                <div class="product-meta">
+                  <span class="meta-brand">${rel.brand}</span>
+                  <a href="product.html?id=${rel.id}" class="meta-title">${rel.title}</a>
+                  <span class="meta-price">${formatPrice(rel.price)}</span>
+                </div>
+              </article>
+            `;
+          }).join("")}
         </div>
       </section>
 
@@ -501,7 +591,59 @@ function switchDetailPhoto(imgUrl, buttonEl) {
 window.switchDetailPhoto = switchDetailPhoto;
 
 // =============================================================================
-// 7. EVENT LISTENERS & LIFECYCLE
+// 7. HOMEPAGE & RENTAL PAGE FEATURED GRIDS
+// =============================================================================
+
+function renderHomeFeatured() {
+  const grid = document.getElementById("home-featured-grid");
+  if (!grid) return;
+  const items = getStudioProducts().slice(0, 4);
+  grid.innerHTML = items.map(item => {
+    const mainImg = (item.images && item.images[0]) || "img/monroe-logo.png";
+    const hoverImg = (item.images && item.images[1]) || mainImg;
+    return `
+      <article class="product-card">
+        <a href="product.html?id=${item.id}" class="product-media" title="View ${item.title}">
+          <img src="${mainImg}" alt="${item.brand} ${item.title}" class="img-main" loading="lazy">
+          <img src="${hoverImg}" alt="${item.brand} ${item.title}" class="img-hover" loading="lazy">
+        </a>
+        <div class="product-meta">
+          <span class="meta-brand">${item.brand}</span>
+          <a href="product.html?id=${item.id}" class="meta-title">${item.title}</a>
+          <span class="meta-price">${formatPrice(item.price)}</span>
+          <a href="product.html?id=${item.id}" class="view-details-link">View Details →</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderRentalFeatured() {
+  const grid = document.getElementById("rental-featured-grid");
+  if (!grid) return;
+  const items = getStudioProducts().filter(p => p.rentalAvailable).slice(0, 4);
+  grid.innerHTML = items.map(item => {
+    const mainImg = (item.images && item.images[0]) || "img/monroe-logo.png";
+    const hoverImg = (item.images && item.images[1]) || mainImg;
+    return `
+      <article class="product-card">
+        <a href="product.html?id=${item.id}" class="product-media" title="View ${item.title}">
+          <img src="${mainImg}" alt="${item.brand} ${item.title}" class="img-main" loading="lazy">
+          <img src="${hoverImg}" alt="${item.brand} ${item.title}" class="img-hover" loading="lazy">
+        </a>
+        <div class="product-meta">
+          <span class="meta-brand">${item.brand}</span>
+          <a href="product.html?id=${item.id}" class="meta-title">${item.title}</a>
+          <span class="meta-price">Rent from ${formatPrice(item.rentalPrice)} / 3 Days</span>
+          <a href="product.html?id=${item.id}" class="view-details-link">View Details & Book →</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+// =============================================================================
+// 8. EVENT LISTENERS & LIFECYCLE
 // =============================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -510,6 +652,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // If on product detail page
   if (document.getElementById("product-detail-view")) {
     initProductDetailPage();
+  }
+
+  // If on home page
+  if (document.getElementById("home-featured-grid")) {
+    renderHomeFeatured();
+  }
+
+  // If on rental page
+  if (document.getElementById("rental-featured-grid")) {
+    renderRentalFeatured();
   }
 
   // If on shop catalog page
