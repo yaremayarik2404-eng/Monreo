@@ -125,7 +125,6 @@
 
       <!-- Center Logo -->
       <a href="index.html" class="brand-logo">
-        <img src="img/monroe-logo.png" alt="Monroe Logo" class="logo-mark" onerror="this.style.display='none'">
         <span class="logo-title">MONROE</span>
       </a>
 
@@ -261,65 +260,7 @@
         <h2 style="font-family: var(--font-serif); font-size: 2rem; font-weight: 400;">Featured Rental Pieces</h2>
       </div>
 
-      <div class="minimal-grid" id="rental-featured-grid">
-        
-        <!-- Rental Item 1 -->
-        <article class="product-card">
-          <a href="product.html?id=blazer-blue-001" class="product-media" title="View Classic Light Blue Loose Blazer">
-            <img src="img/dresses.png" alt="H&M Classic Light Blue Loose Blazer" class="img-main" loading="lazy">
-            <img src="img/outerwear.png" alt="H&M Classic Light Blue Loose Blazer" class="img-hover" loading="lazy">
-          </a>
-          <div class="product-meta">
-            <span class="meta-brand">H&M</span>
-            <a href="product.html?id=blazer-blue-001" class="meta-title">Classic Light Blue Loose Blazer</a>
-            <span class="meta-price">Rent from 400 ₴ / 3 Days</span>
-            <a href="product.html?id=blazer-blue-001" class="view-details-link">View Details & Book →</a>
-          </div>
-        </article>
-
-        <!-- Rental Item 2 -->
-        <article class="product-card">
-          <a href="product.html?id=look-lilac-009" class="product-media" title="View Set: Lilac Blazer & Purple Flats">
-            <img src="img/outerwear.png" alt="Zara / Intervallo Set: Lilac Blazer & Purple Flats" class="img-main" loading="lazy">
-            <img src="img/shoes1.png" alt="Zara / Intervallo Set: Lilac Blazer & Purple Flats" class="img-hover" loading="lazy">
-          </a>
-          <div class="product-meta">
-            <span class="meta-brand">Zara / Intervallo</span>
-            <a href="product.html?id=look-lilac-009" class="meta-title">Set: Lilac Blazer & Purple Flats</a>
-            <span class="meta-price">Rent from 650 ₴ / 3 Days</span>
-            <a href="product.html?id=look-lilac-009" class="view-details-link">View Details & Book →</a>
-          </div>
-        </article>
-
-        <!-- Rental Item 3 -->
-        <article class="product-card">
-          <a href="product.html?id=sandals-pearls-010" class="product-media" title="View Evening Heels with Pearls and Crystals">
-            <img src="img/shoes1.png" alt="Jimmy Choo Evening Heels with Pearls and Crystals" class="img-main" loading="lazy">
-            <img src="img/shoes2.png" alt="Jimmy Choo Evening Heels with Pearls and Crystals" class="img-hover" loading="lazy">
-          </a>
-          <div class="product-meta">
-            <span class="meta-brand">Jimmy Choo</span>
-            <a href="product.html?id=sandals-pearls-010" class="meta-title">Evening Heels with Pearls and Crystals</a>
-            <span class="meta-price">Rent from 1 200 ₴ / 3 Days</span>
-            <a href="product.html?id=sandals-pearls-010" class="view-details-link">View Details & Book →</a>
-          </div>
-        </article>
-
-        <!-- Rental Item 4 -->
-        <article class="product-card">
-          <a href="product.html?id=bag-animal-004" class="product-media" title="View Snake-Pattern Animal Print Tote Bag">
-            <img src="img/jewelry2,3.png" alt="Guess Snake-Pattern Animal Print Tote Bag" class="img-main" loading="lazy">
-            <img src="img/jewelry2,2.png" alt="Guess Snake-Pattern Animal Print Tote Bag" class="img-hover" loading="lazy">
-          </a>
-          <div class="product-meta">
-            <span class="meta-brand">Guess</span>
-            <a href="product.html?id=bag-animal-004" class="meta-title">Snake-Pattern Animal Print Tote Bag</a>
-            <span class="meta-price">Rent from 500 ₴ / 3 Days</span>
-            <a href="product.html?id=bag-animal-004" class="view-details-link">View Details & Book →</a>
-          </div>
-        </article>
-
-      </div>
+      <div class="minimal-grid" id="rental-featured-grid"></div>
     </section>
 
     <!-- BOOK A FITTING FORM -->
@@ -358,7 +299,10 @@
   <div class="toast-wrap" id="toast-container"></div>
 
   <!-- Shared Data & Scripts -->
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="products-data.js"></script>
   <script src="script.js"></script>
+  
+
 </body>
 </html>

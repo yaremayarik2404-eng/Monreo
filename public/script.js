@@ -7,6 +7,140 @@
 // 0. DATA ACCESS HELPERS & CURRENCY FORMATTING
 // =============================================================================
 
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchProductsFromSupabase();
+
+  if (typeof populateBrandFilter === "function") {
+    populateBrandFilter();
+  }
+  if (typeof renderShopCatalog === "function") {
+    renderShopCatalog();
+  }
+  if (typeof initProductDetailPage === "function") {
+    initProductDetailPage();
+  }
+  if (typeof renderHomeFeatured === "function") {
+    renderHomeFeatured();
+  }
+  if (typeof renderRentalFeatured === "function") {
+    renderRentalFeatured();
+  }
+
+    renderCartDrawer();
+
+
+  // If on shop catalog page
+  if (document.getElementById("catalog-products-grid")) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("category")) activeShopFilters.category = params.get("category");
+    if (params.get("sub")) activeShopFilters.subcategory = params.get("sub");
+    if (params.get("brand")) activeShopFilters.brand = params.get("brand");
+    if (params.get("search")) activeShopFilters.searchQuery = params.get("search");
+
+    renderShopCatalog();
+
+    // Category button clicks
+    document.querySelectorAll(".shop-cat-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeShopFilters.category = btn.getAttribute("data-cat");
+        activeShopFilters.subcategory = "All";
+        renderShopCatalog();
+      });
+    });
+
+    // Subcategory pill clicks
+    document.querySelectorAll(".shop-sub-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeShopFilters.subcategory = btn.getAttribute("data-sub");
+        renderShopCatalog();
+      });
+    });
+
+    // Brand filter select
+    const brandSelect = document.getElementById("shop-filter-brand");
+    if (brandSelect) {
+      if (activeShopFilters.brand !== "All") brandSelect.value = activeShopFilters.brand;
+      brandSelect.addEventListener("change", (e) => {
+        activeShopFilters.brand = e.target.value;
+        renderShopCatalog();
+      });
+    }
+
+    // Sort select
+    document.getElementById("shop-filter-sort")?.addEventListener("change", (e) => {
+      activeShopFilters.sortBy = e.target.value;
+      renderShopCatalog();
+    });
+
+    // Reset button
+    document.getElementById("shop-reset-btn")?.addEventListener("click", () => {
+      activeShopFilters = { searchQuery: "", category: "All", subcategory: "All", brand: "All", sortBy: "featured" };
+      if (brandSelect) brandSelect.value = "All";
+      renderShopCatalog();
+    });
+  }
+
+  // Cart Open/Close
+  document.getElementById("cart-btn")?.addEventListener("click", openCartDrawer);
+  document.getElementById("close-cart-btn")?.addEventListener("click", closeCartDrawer);
+  document.getElementById("cart-drawer-backdrop")?.addEventListener("click", (e) => {
+    if (e.target.id === "cart-drawer-backdrop") closeCartDrawer();
+  });
+
+  // Search Open/Close
+  document.getElementById("search-btn")?.addEventListener("click", openSearchOverlay);
+  document.getElementById("close-search-btn")?.addEventListener("click", closeSearchOverlay);
+
+  // Search live input & enter submission
+  const searchInput = document.getElementById("live-search-input");
+  searchInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      handleSearchSubmit(searchInput.value.trim());
+    }
+  });
+
+  // Mobile Drawer
+  document.getElementById("burger-menu")?.addEventListener("click", openMobileDrawer);
+  document.getElementById("close-mobile-nav-btn")?.addEventListener("click", closeMobileDrawer);
+  document.getElementById("mobile-nav-backdrop")?.addEventListener("click", (e) => {
+    if (e.target.id === "mobile-nav-backdrop") closeMobileDrawer();
+  });
+
+  // Mobile Accordion: Shop
+  const mShopBtn = document.getElementById("mobile-shop-btn");
+  mShopBtn?.addEventListener("click", function() {
+    this.classList.toggle("open");
+    document.getElementById("mobile-shop-content")?.classList.toggle("open");
+    const arr = this.querySelector(".acc-arrow");
+    if (arr) arr.textContent = this.classList.contains("open") ? "−" : "+";
+  });
+
+  // Mobile Accordion: Clothing
+  const mClothBtn = document.getElementById("mobile-clothing-btn");
+  mClothBtn?.addEventListener("click", function() {
+    this.classList.toggle("open");
+    document.getElementById("mobile-clothing-content")?.classList.toggle("open");
+    const arr = this.querySelector(".acc-arrow");
+    if (arr) arr.textContent = this.classList.contains("open") ? "−" : "+";
+  });
+
+  // Checkout button simulation
+  document.getElementById("checkout-btn")?.addEventListener("click", () => {
+    if (studioCart.length === 0) return;
+    alert("Proceeding to secure checkout with Monroe Closet Studio.");
+  });
+
+  // Escape Key to close drawers
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeCartDrawer();
+      closeSearchOverlay();
+      closeMobileDrawer();
+    }
+  });
+});
+
 function getStudioProducts() {
   if (typeof window.getProductItems === "function") {
     return window.getProductItems();
@@ -315,7 +449,7 @@ function renderShopCatalog() {
   const emptyView = document.getElementById("catalog-empty-view");
   if (!grid) return;
 
-  populateBrandFilter();
+  
 
   let list = [...getStudioProducts()];
 
@@ -457,8 +591,25 @@ function initProductDetailPage() {
 
   document.title = `${product.brand} — ${product.title} | MONROE CLOSET STUDIO`;
 
-  const details = product.details || {};
+
+const details = product.details || {};
   const images = (product.images && product.images.length > 0) ? product.images : ["img/monroe-logo.png"];
+
+  // Словник гарних назв для стандартних ключів (для кастомних назва підтягнеться автоматично)
+  const specLabelsMap = {
+    composition: "Composition",
+    size: "Size / Fit",
+    measurements: "Measurements",
+    heelHeight: "Heel Height",
+    weight: "Weight",
+    origin: "Origin",
+    conditionNotes: "Condition",
+    authenticity: "Authenticity"
+  };
+
+  // Беремо всі непорожні пари з об'єкта details
+  const detailEntries = Object.entries(details).filter(([_, val]) => val !== null && val !== undefined && String(val).trim() !== "");
+  const hasSpecs = detailEntries.length > 0;
 
   container.innerHTML = `
     <div class="container">
@@ -478,78 +629,83 @@ function initProductDetailPage() {
         
         <!-- Gallery with Thumbnails -->
         <div class="product-gallery">
-          <div class="main-image-wrap">
+          <div class="product-thumbs">
+            ${images.map((imgUrl, i) => `
+              <button class="thumb-btn ${i === 0 ? 'is-active' : ''}" onclick="switchDetailPhoto('${imgUrl}', this)" aria-label="Angle ${i + 1}">
+                <img src="${imgUrl}" alt="Thumbnail ${i + 1}">
+              </button>
+            `).join("")}
+          </div>
+
+          <div class="product-main-stage">
             <img src="${images[0]}" alt="${product.brand} ${product.title}" id="detail-main-img" class="detail-main-photo">
           </div>
-
-          ${images.length > 1 ? `
-            <div class="gallery-thumbs">
-              ${images.map((imgUrl, i) => `
-                <button class="thumb-btn ${i === 0 ? 'active' : ''}" onclick="switchDetailPhoto('${imgUrl}', this)" aria-label="Angle ${i+1}">
-                  <img src="${imgUrl}" alt="Thumbnail ${i+1}">
-                </button>
-              `).join("")}
-            </div>
-          ` : ''}
         </div>
 
-        <!-- Specifications & Description Column -->
-        <div class="product-info-column">
-          <span class="product-brand-kicker">${product.brand}</span>
-          <h1 class="product-headline">${product.title}</h1>
-          
-          <div class="product-price-row">
+        <!-- Clean Editorial Info Column (без акордеонів) -->
+        <div class="product-info-column editorial-info">
+          <div class="editorial-header">
+            <span class="product-brand-kicker">${product.brand}</span>
+            ${product.condition ? `<span class="editorial-condition">${product.condition}</span>` : ''}
+          </div>
+
+          <h1 class="product-headline editorial-title">${product.title}</h1>
+
+          <div class="editorial-price-row">
             <span class="product-primary-price">${formatPrice(product.price)}</span>
             ${product.originalPrice > product.price ? `
-              <span class="product-orig-price">Retail: ${formatPrice(product.originalPrice)}</span>
+              <span class="product-orig-price">Est. Retail ${formatPrice(product.originalPrice)}</span>
             ` : ''}
-            <span class="product-condition-tag">${product.condition}</span>
           </div>
 
-          <!-- Description Text -->
-          <div class="product-description-text">
-            <p>${product.description}</p>
-          </div>
-
-          <!-- Specifications Box -->
-          <div class="product-specs-box">
-            <h3>Specifications & Provenance</h3>
-            <ul class="specs-list">
-              ${details.composition ? `<li><strong>Composition:</strong> <span>${details.composition}</span></li>` : ''}
-              ${details.size ? `<li><strong>Size / Fit:</strong> <span>${details.size}</span></li>` : ''}
-              ${details.measurements ? `<li><strong>Measurements:</strong> <span>${details.measurements}</span></li>` : ''}
-              ${details.heelHeight ? `<li><strong>Heel Height:</strong> <span>${details.heelHeight}</span></li>` : ''}
-              ${details.weight ? `<li><strong>Weight:</strong> <span>${details.weight}</span></li>` : ''}
-              ${details.origin ? `<li><strong>Craftsmanship:</strong> <span>${details.origin}</span></li>` : ''}
-              ${details.conditionNotes ? `<li><strong>Condition Report:</strong> <span>${details.conditionNotes}</span></li>` : ''}
-              ${details.authenticity ? `<li><strong>Authentication:</strong> <span>${details.authenticity}</span></li>` : ''}
-            </ul>
-          </div>
-
-          ${product.rentalAvailable ? `
-            <div class="rental-option-notice">
-              <strong>✨ Rental Available</strong>
-              <span>Available for 3-Day Rental at ${formatPrice(product.rentalPrice)} with eco dry-cleaning included.</span>
-              <a href="rental.html" class="rental-notice-link">View Rental Details →</a>
+          ${details.size ? `
+            <div class="editorial-size-line">
+              <span class="size-label">Size</span>
+              <span class="size-value">${details.size}</span>
             </div>
           ` : ''}
 
-          <!-- Actions -->
-          <div class="product-action-stack">
+          <!-- Primary Actions -->
+          <div class="editorial-actions">
             <button class="btn-add-bag" onclick="addToCart('${product.id}')">
-              Add to Shopping Bag — ${formatPrice(product.price)}
+              Add to Bag — ${formatPrice(product.price)}
             </button>
-            <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener" class="btn-inquire">
-              Inquire on Instagram (@monroecloset.studio)
+
+            ${product.rentalAvailable ? `
+              <a href="rental.html" class="btn-rent-minimal">
+                Rent for 3 Days — ${formatPrice(product.rentalPrice)}
+              </a>
+            ` : ''}
+
+            <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener" class="editorial-concierge-link">
+              Ask a Stylist on Instagram →
             </a>
           </div>
 
-          <div class="guarantee-points">
-            <span>✓ 100% Certified Authentic</span>
-            <span>✓ Insured Global Shipping</span>
-            <span>✓ Private Studio Fitting Available</span>
-          </div>
+          <!-- Open Information Sections -->
+          <div class="editorial-open-sections">
+          ${hasSpecs ? `
+              <div class="ed-block">
+                <h2 class="ed-block-title">Details & Measurements</h2>
+                <ul class="ed-specs">
+                  ${detailEntries.map(([key, val]) => {
+                    // Якщо ключ є в словнику — беремо гарну назву, інакше робимо першу літеру великою
+                    const label = specLabelsMap[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+                    return `<li><span>${label}</span><span>${val}</span></li>`;
+                  }).join("")}
+                </ul>
+              </div>
+            ` : ''}
+            ${product.description ? `
+                <div class="ed-block">
+                  <h2 class="ed-block-title">Description</h2>
+                  <p class="ed-desc">${product.description}</p>
+                </div>
+              `
+             : ''}
 
+
+          </div>
         </div>
 
       </div>
@@ -579,14 +735,148 @@ function initProductDetailPage() {
       </section>
 
     </div>
-  `;
+  `;  enableProductImageZoom();
+  enableMobileGalleryLightbox(images)
 }
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function updateLightboxView() {
+  const overlay = document.getElementById("lightbox-overlay");
+  const lightboxImg = document.getElementById("lightbox-img");
+  const counterEl = document.getElementById("lightbox-counter");
+  if (!overlay || !lightboxImg || lightboxImages.length === 0) return;
+
+  const safeIdx = ((lightboxIndex % lightboxImages.length) + lightboxImages.length) % lightboxImages.length;
+  lightboxIndex = safeIdx;
+  lightboxImg.src = lightboxImages[lightboxIndex];
+  lightboxImg.alt = `Gallery image ${lightboxIndex + 1} of ${lightboxImages.length}`;
+
+  if (counterEl) {
+    counterEl.textContent = `${lightboxIndex + 1} / ${lightboxImages.length}`;
+  }
+}
+
+function openGalleryLightbox(images, startIndex = 0) {
+  const overlay = document.getElementById("lightbox-overlay");
+  if (!overlay || !Array.isArray(images) || images.length === 0) return;
+
+  lightboxImages = images;
+  lightboxIndex = startIndex;
+  updateLightboxView();
+
+  overlay.classList.add("is-open");
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeGalleryLightbox() {
+  const overlay = document.getElementById("lightbox-overlay");
+  if (!overlay) return;
+
+  overlay.classList.remove("is-open");
+  overlay.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function enableMobileGalleryLightbox(images) {
+  const stage = document.querySelector(".product-main-stage");
+  const mainImg = document.getElementById("detail-main-img");
+  const overlay = document.getElementById("lightbox-overlay");
+  if (!stage || !mainImg || !overlay) return;
+
+  // Створюємо кнопки навігації і лічильник один раз
+  if (!document.getElementById("lightbox-prev")) {
+    const prevBtn = document.createElement("button");
+    prevBtn.type = "button";
+    prevBtn.id = "lightbox-prev";
+    prevBtn.className = "lightbox-nav lightbox-prev";
+    prevBtn.setAttribute("aria-label", "Previous image");
+    prevBtn.textContent = "‹";
+
+    const nextBtn = document.createElement("button");
+    nextBtn.type = "button";
+    nextBtn.id = "lightbox-next";
+    nextBtn.className = "lightbox-nav lightbox-next";
+    nextBtn.setAttribute("aria-label", "Next image");
+    nextBtn.textContent = "›";
+
+    const counter = document.createElement("div");
+    counter.id = "lightbox-counter";
+    counter.className = "lightbox-counter";
+
+    overlay.appendChild(prevBtn);
+    overlay.appendChild(nextBtn);
+    overlay.appendChild(counter);
+
+    prevBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      lightboxIndex -= 1;
+      updateLightboxView();
+    });
+
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      lightboxIndex += 1;
+      updateLightboxView();
+    });
+  }
+
+  // Натискання на головне фото відкриває галерею (особливо зручно на телефонах/тач-екранах)
+  stage.addEventListener("click", () => {
+    const currentSrc = mainImg.getAttribute("src");
+    const foundIdx = images.indexOf(currentSrc);
+    openGalleryLightbox(images, foundIdx >= 0 ? foundIdx : 0);
+  });
+
+  // Закриття по кнопці або кліку по темному фону
+  document.getElementById("lightbox-close")?.addEventListener("click", closeGalleryLightbox);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeGalleryLightbox();
+  });
+
+  // Свайп вліво/вправо всередині галереї на телефоні
+  let touchStartX = 0;
+  overlay.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  overlay.addEventListener("touchend", (e) => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > 45) {
+      lightboxIndex += diff < 0 ? 1 : -1;
+      updateLightboxView();
+    }
+  }, { passive: true });
+}
+
+function enableProductImageZoom() {
+  const stage = document.querySelector(".product-main-stage");
+  const img = document.getElementById("detail-main-img");
+  if (!stage || !img) return;
+
+  stage.addEventListener("mousemove", (e) => {
+    const rect = stage.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    img.style.transformOrigin = `${x}% ${y}%`;
+    img.style.transform = "scale(2.2)"; // Сила збільшення при розгляданні
+  });
+
+  stage.addEventListener("mouseleave", () => {
+    img.style.transformOrigin = "center center";
+    img.style.transform = "scale(1)";
+  });
+}
+
 
 function switchDetailPhoto(imgUrl, buttonEl) {
   const mainPhoto = document.getElementById("detail-main-img");
   if (mainPhoto) mainPhoto.src = imgUrl;
-  document.querySelectorAll(".thumb-btn").forEach(btn => btn.classList.remove("active"));
-  buttonEl?.classList.add("active");
+  document.querySelectorAll(".thumb-btn").forEach(btn => btn.classList.remove("is-active"));
+  buttonEl?.classList.add("is-active");
 }
 window.switchDetailPhoto = switchDetailPhoto;
 
@@ -594,29 +884,6 @@ window.switchDetailPhoto = switchDetailPhoto;
 // 7. HOMEPAGE & RENTAL PAGE FEATURED GRIDS
 // =============================================================================
 
-function renderHomeFeatured() {
-  const grid = document.getElementById("home-featured-grid");
-  if (!grid) return;
-  const items = getStudioProducts().slice(0, 4);
-  grid.innerHTML = items.map(item => {
-    const mainImg = (item.images && item.images[0]) || "img/monroe-logo.png";
-    const hoverImg = (item.images && item.images[1]) || mainImg;
-    return `
-      <article class="product-card">
-        <a href="product.html?id=${item.id}" class="product-media" title="View ${item.title}">
-          <img src="${mainImg}" alt="${item.brand} ${item.title}" class="img-main" loading="lazy">
-          <img src="${hoverImg}" alt="${item.brand} ${item.title}" class="img-hover" loading="lazy">
-        </a>
-        <div class="product-meta">
-          <span class="meta-brand">${item.brand}</span>
-          <a href="product.html?id=${item.id}" class="meta-title">${item.title}</a>
-          <span class="meta-price">${formatPrice(item.price)}</span>
-          <a href="product.html?id=${item.id}" class="view-details-link">View Details →</a>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
 
 function renderRentalFeatured() {
   const grid = document.getElementById("rental-featured-grid");
@@ -646,131 +913,133 @@ function renderRentalFeatured() {
 // 8. EVENT LISTENERS & LIFECYCLE
 // =============================================================================
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderCartDrawer();
 
-  // If on product detail page
-  if (document.getElementById("product-detail-view")) {
-    initProductDetailPage();
+
+
+// Good display of items on all pages
+
+
+(function () {
+  const grid = document.getElementById("rental-featured-grid");
+  if (!grid) return;
+
+  function formatPriceUah(price) {
+    if (price === null || price === undefined || price === "") return "";
+    const num = Number(price);
+    if (Number.isNaN(num)) return String(price);
+    return `${num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₴`;
   }
 
-  // If on home page
-  if (document.getElementById("home-featured-grid")) {
-    renderHomeFeatured();
+  function renderRentalProducts(items) {
+    if (!Array.isArray(items) || items.length === 0) return;
+
+    const rentalPool = items.filter((p) => p.rentalAvailable === true);
+    const source = rentalPool.length > 0 ? rentalPool : items;
+
+    // Динамічно беремо id орендних товарів із актуального списку items
+    const rentalIds = rentalPool.map((p) => String(p.id));
+    console.log("Rental IDs:", rentalIds);
+
+    const picked = rentalIds
+      .map((id) => source.find((p) => String(p.id) === id))
+      .filter(Boolean);
+
+    const productsToShow = (picked.length > 0 ? picked : source).slice(0, rentalIds.length);
+
+    grid.innerHTML = productsToShow
+      .map((product) => {
+        const imgs = Array.isArray(product.images) ? product.images : [];
+        const mainImg = imgs[0] || "";
+        const hoverImg = imgs[1] || mainImg;
+        const title = product.title || "";
+        const brand = product.brand || "";
+        const imgAlt = `${brand} ${title}`.trim();
+        const rentPriceFormatted = formatPriceUah(product.rentalPrice);
+        const rentLabel = rentPriceFormatted ? `Rent from ${rentPriceFormatted} / 3 Days` : "";
+        const productUrl = `product.html?id=${encodeURIComponent(product.id)}`;
+
+        return `
+          <article class="product-card">
+            <a href="${productUrl}" class="product-media" title="View ${title}">
+              ${mainImg ? `<img src="${mainImg}" alt="${imgAlt}" class="img-main" loading="lazy">` : ""}
+              ${hoverImg ? `<img src="${hoverImg}" alt="${imgAlt}" class="img-hover" loading="lazy">` : ""}
+            </a>
+            <div class="product-meta">
+              ${brand ? `<span class="meta-brand">${brand}</span>` : ""}
+              <a href="${productUrl}" class="meta-title">${title}</a>
+              ${rentLabel ? `<span class="meta-price">${rentLabel}</span>` : ""}
+              <a href="${productUrl}" class="view-details-link">View Details & Book →</a>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
   }
 
-  // If on rental page
-  if (document.getElementById("rental-featured-grid")) {
-    renderRentalFeatured();
+  const initialItems = typeof getProductItems === "function" ? getProductItems() : [];
+  if (initialItems.length > 0) {
+    renderRentalProducts(initialItems);
   }
 
-  // If on shop catalog page
-  if (document.getElementById("catalog-products-grid")) {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("category")) activeShopFilters.category = params.get("category");
-    if (params.get("sub")) activeShopFilters.subcategory = params.get("sub");
-    if (params.get("brand")) activeShopFilters.brand = params.get("brand");
-    if (params.get("search")) activeShopFilters.searchQuery = params.get("search");
-
-    renderShopCatalog();
-
-    // Category button clicks
-    document.querySelectorAll(".shop-cat-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        activeShopFilters.category = btn.getAttribute("data-cat");
-        activeShopFilters.subcategory = "All";
-        renderShopCatalog();
-      });
-    });
-
-    // Subcategory pill clicks
-    document.querySelectorAll(".shop-sub-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        activeShopFilters.subcategory = btn.getAttribute("data-sub");
-        renderShopCatalog();
-      });
-    });
-
-    // Brand filter select
-    const brandSelect = document.getElementById("shop-filter-brand");
-    if (brandSelect) {
-      if (activeShopFilters.brand !== "All") brandSelect.value = activeShopFilters.brand;
-      brandSelect.addEventListener("change", (e) => {
-        activeShopFilters.brand = e.target.value;
-        renderShopCatalog();
-      });
-    }
-
-    // Sort select
-    document.getElementById("shop-filter-sort")?.addEventListener("change", (e) => {
-      activeShopFilters.sortBy = e.target.value;
-      renderShopCatalog();
-    });
-
-    // Reset button
-    document.getElementById("shop-reset-btn")?.addEventListener("click", () => {
-      activeShopFilters = { searchQuery: "", category: "All", subcategory: "All", brand: "All", sortBy: "featured" };
-      if (brandSelect) brandSelect.value = "All";
-      renderShopCatalog();
+  if (typeof fetchProductsFromSupabase === "function") {
+    fetchProductsFromSupabase().then((liveItems) => {
+      if (Array.isArray(liveItems) && liveItems.length > 0) {
+        renderRentalProducts(liveItems);
+      }
     });
   }
+})();
 
-  // Cart Open/Close
-  document.getElementById("cart-btn")?.addEventListener("click", openCartDrawer);
-  document.getElementById("close-cart-btn")?.addEventListener("click", closeCartDrawer);
-  document.getElementById("cart-drawer-backdrop")?.addEventListener("click", (e) => {
-    if (e.target.id === "cart-drawer-backdrop") closeCartDrawer();
-  });
 
-  // Search Open/Close
-  document.getElementById("search-btn")?.addEventListener("click", openSearchOverlay);
-  document.getElementById("close-search-btn")?.addEventListener("click", closeSearchOverlay);
 
-  // Search live input & enter submission
-  const searchInput = document.getElementById("live-search-input");
-  searchInput?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      handleSearchSubmit(searchInput.value.trim());
-    }
-  });
+// WHich items will be in main page
 
-  // Mobile Drawer
-  document.getElementById("burger-menu")?.addEventListener("click", openMobileDrawer);
-  document.getElementById("close-mobile-nav-btn")?.addEventListener("click", closeMobileDrawer);
-  document.getElementById("mobile-nav-backdrop")?.addEventListener("click", (e) => {
-    if (e.target.id === "mobile-nav-backdrop") closeMobileDrawer();
-  });
+function getMainPageItems(allItems) {
+  if (!Array.isArray(allItems) || allItems.length === 0) return [];
 
-  // Mobile Accordion: Shop
-  const mShopBtn = document.getElementById("mobile-shop-btn");
-  mShopBtn?.addEventListener("click", function() {
-    this.classList.toggle("open");
-    document.getElementById("mobile-shop-content")?.classList.toggle("open");
-    const arr = this.querySelector(".acc-arrow");
-    if (arr) arr.textContent = this.classList.contains("open") ? "−" : "+";
-  });
+  // Фільтруємо ті товари, у яких позначка isonmainpage увімкнена
+  const mainPool = allItems.filter((p) => p.isonmainpage === true);
 
-  // Mobile Accordion: Clothing
-  const mClothBtn = document.getElementById("mobile-clothing-btn");
-  mClothBtn?.addEventListener("click", function() {
-    this.classList.toggle("open");
-    document.getElementById("mobile-clothing-content")?.classList.toggle("open");
-    const arr = this.querySelector(".acc-arrow");
-    if (arr) arr.textContent = this.classList.contains("open") ? "−" : "+";
-  });
+  // Як ти робив із rentalIds: динамічно збираємо масив ID обраних товарів
+  const mainIds = mainPool.map((p) => String(p.id));
 
-  // Checkout button simulation
-  document.getElementById("checkout-btn")?.addEventListener("click", () => {
-    if (studioCart.length === 0) return;
-    alert("Proceeding to secure checkout with Monroe Closet Studio.");
-  });
+  // Підтягуємо актуальні об'єкти товарів за цим масивом ID
+  const picked = mainIds
+    .map((id) => mainPool.find((p) => String(p.id) === id))
+    .filter(Boolean);
 
-  // Escape Key to close drawers
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeCartDrawer();
-      closeSearchOverlay();
-      closeMobileDrawer();
-    }
-  });
-});
+  return picked;
+}
+
+function renderHomeFeatured() {
+  const grid = document.getElementById("home-featured-grid");
+  if (!grid) return;
+
+  const items = getMainPageItems(getStudioProducts());
+  if (items.length === 0) return;
+
+  grid.innerHTML = items
+    .map((item) => {
+      const imgs = Array.isArray(item.images) ? item.images : [];
+      const mainImg = imgs[0] || "";
+      const hoverImg = imgs[1] || mainImg;
+      const altText = `${item.brand || ""} ${item.title || ""}`.trim();
+      const url = `product.html?id=${encodeURIComponent(item.id)}`;
+
+      return `
+        <article class="product-card">
+          <a href="${url}" class="product-media" title="View ${item.title || ""}">
+            ${mainImg ? `<img src="${mainImg}" alt="${altText}" class="img-main" loading="lazy">` : ""}
+            ${hoverImg ? `<img src="${hoverImg}" alt="${altText}" class="img-hover" loading="lazy">` : ""}
+          </a>
+          <div class="product-meta">
+            ${item.brand ? `<span class="meta-brand">${item.brand}</span>` : ""}
+            <a href="${url}" class="meta-title">${item.title || ""}</a>
+            <span class="meta-price">${formatPrice(item.price)}</span>
+            <a href="${url}" class="view-details-link">View Details →</a>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}

@@ -4,20 +4,368 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Details | MONROE CLOSET STUDIO</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
+
   <link rel="stylesheet" href="style.css">
+  <style>
+    .product-page-main {
+      padding: 28px 0 96px;
+      min-height: 70vh;
+    }
+
+    .product-crumb {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .product-crumb a {
+      color: inherit;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: 52px;
+      align-items: start;
+    }
+
+    .gallery-wrap {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .thumbs-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 680px;
+      overflow-y: auto;
+    }
+
+    .thumb-item {
+      aspect-ratio: 3 / 4;
+      background: var(--bg-subtle);
+      border: 1px solid transparent;
+      opacity: 0.6;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .thumb-item.is-active,
+    .thumb-item:hover {
+      opacity: 1;
+      border-color: var(--text-main);
+    }
+
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .stage-box {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      background: var(--bg-subtle);
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+
+    .stage-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.15s ease-out;
+    }
+
+    .stage-counter {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      padding: 4px 10px;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-main);
+    }
+
+    .info-col {
+      position: sticky;
+      top: 96px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .info-brand {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .info-condition {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    .info-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3vw, 2.7rem);
+      font-weight: 400;
+      line-height: 1.12;
+      margin-bottom: 18px;
+    }
+
+    .info-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding-bottom: 20px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-price {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .info-price-old {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      text-decoration: line-through;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .mode-btn {
+      text-align: left;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .mode-btn.is-selected {
+      border-color: var(--text-main);
+      background: var(--bg-subtle);
+    }
+
+    .mode-btn strong {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .mode-btn span {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .info-cta-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .cta-primary {
+      width: 100%;
+      padding: 15px 20px;
+      background: var(--text-main);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .cta-primary:hover {
+      background: #262626;
+    }
+
+    .cta-ghost {
+      width: 100%;
+      padding: 13px 20px;
+      border: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.74rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .cta-ghost:hover {
+      border-color: var(--text-main);
+      opacity: 1;
+    }
+
+    .info-desc {
+      font-size: 0.94rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    .similar-block {
+      margin-top: 84px;
+      padding-top: 52px;
+      border-top: 1px solid var(--border);
+    }
+
+    .similar-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 28px;
+    }
+
+    .similar-head h2 {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 400;
+    }
+
+    .similar-head a {
+      font-size: 0.74rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.94);
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .lightbox-overlay.is-open {
+      display: flex;
+    }
+
+    .lightbox-overlay img {
+      max-width: 92vw;
+      max-height: 88vh;
+      object-fit: contain;
+    }
+    .lightbox-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  z-index: 3001;
+}
+
+.lightbox-prev {
+  left: 16px;
+}
+
+.lightbox-next {
+  right: 16px;
+}
+
+.lightbox-counter {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  z-index: 3001;
+}
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 980px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .info-col {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .gallery-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .thumbs-col {
+        order: 2;
+        flex-direction: row;
+        overflow-x: auto;
+        max-height: none;
+      }
+
+      .thumb-item {
+        flex: 0 0 66px;
+      }
+
+      .mode-switch {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <!-- Minimal Header -->
   <header class="studio-header" id="header">
     <div class="header-container">
-      
-      <!-- Mobile Burger -->
+
       <button class="burger-btn" id="burger-menu" aria-label="Open menu">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <line x1="3" y1="7" x2="21" y2="7"/>
@@ -25,17 +373,12 @@
         </svg>
       </button>
 
-      <!-- Desktop Navigation with Immediate Hover Dropdown -->
       <nav class="nav-left" aria-label="Primary">
         <ul class="nav-links">
-          
-          <!-- SHOP -->
           <li class="nav-item has-dropdown">
             <a href="shop.html" class="nav-anchor">Shop</a>
-            
             <div class="dropdown-panel mega-panel">
               <div class="dropdown-inner">
-                
                 <div class="dropdown-col">
                   <a href="shop.html?category=Clothing" class="col-heading">Clothing</a>
                   <ul class="sub-links">
@@ -79,12 +422,10 @@
                     <li><a href="shop.html?category=Accessories%20%2F%20jewelry">Scarves & Belts</a></li>
                   </ul>
                 </div>
-
               </div>
             </div>
           </li>
 
-          <!-- CLOTHING RENTAL -->
           <li class="nav-item has-dropdown">
             <a href="rental.html" class="nav-anchor">Clothing rental</a>
             <div class="dropdown-panel simple-panel">
@@ -96,7 +437,6 @@
             </div>
           </li>
 
-          <!-- PERSONAL SHOPPING AND STYLING -->
           <li class="nav-item has-dropdown">
             <a href="styling.html" class="nav-anchor">Personal shopping and styling</a>
             <div class="dropdown-panel simple-panel">
@@ -108,7 +448,6 @@
             </div>
           </li>
 
-          <!-- ABOUT US -->
           <li class="nav-item has-dropdown">
             <a href="about.html" class="nav-anchor">About us</a>
             <div class="dropdown-panel simple-panel">
@@ -119,17 +458,13 @@
               </ul>
             </div>
           </li>
-
         </ul>
       </nav>
 
-      <!-- Center Logo -->
       <a href="index.html" class="brand-logo">
-        <img src="img/monroe-logo.png" alt="Monroe Logo" class="logo-mark" onerror="this.style.display='none'">
         <span class="logo-title">MONROE</span>
       </a>
 
-      <!-- Right Controls -->
       <div class="nav-right">
         <button class="icon-btn" id="search-btn" aria-label="Search">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
@@ -139,7 +474,14 @@
         </button>
 
         <button class="icon-btn bag-btn" id="cart-btn" aria-label="Shopping Bag">
-          <span class="bag-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart preview-icon"><path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18"/><path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25"/><circle cx="18" cy="20" r="2"/><circle cx="8" cy="20" r="2"/></svg></span>
+          <span class="bag-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart preview-icon">
+              <path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18"/>
+              <path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25"/>
+              <circle cx="18" cy="20" r="2"/>
+              <circle cx="8" cy="20" r="2"/>
+            </svg>
+          </span>
           <span class="bag-count" id="cart-count">0</span>
         </button>
       </div>
@@ -157,7 +499,7 @@
     </div>
   </div>
 
-  <!-- SLIDE-OVER BAG (SIDE CART) -->
+  <!-- SLIDE-OVER BAG -->
   <div class="cart-overlay" id="cart-drawer-backdrop">
     <div class="cart-panel" id="cart-drawer">
       <div class="cart-header">
@@ -183,7 +525,6 @@
         <button class="mobile-close" id="close-mobile-nav-btn" aria-label="Close menu">✕</button>
       </div>
       <div class="mobile-menu-body">
-        
         <div class="mobile-accordion">
           <button class="mobile-acc-header" id="mobile-shop-btn">
             <span>Shop</span>
@@ -223,10 +564,14 @@
     </div>
   </div>
 
-  <!-- DYNAMIC PRODUCT DETAIL CONTAINER -->
-  <main class="product-detail-section" id="product-detail-view">
-    <!-- Populated dynamically by script.js using products-data.js -->
-  </main>
+  <!-- PRODUCT CONTENT -->
+  <main class="product-page-main" id="product-detail-view"></main>
+
+  <!-- ZOOM LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox-overlay" aria-hidden="true">
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
+    <img src="" alt="" id="lightbox-img">
+  </div>
 
   <!-- MINIMAL FOOTER -->
   <footer class="minimal-footer">
@@ -246,8 +591,10 @@
 
   <div class="toast-wrap" id="toast-container"></div>
 
-  <!-- Shared Data & Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="products-data.js"></script>
   <script src="script.js"></script>
+  
+  
 </body>
 </html>
