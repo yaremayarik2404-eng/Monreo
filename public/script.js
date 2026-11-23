@@ -125,10 +125,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (arr) arr.textContent = this.classList.contains("open") ? "−" : "+";
   });
 
-  // Checkout button simulation
+  // Checkout button — navigate to checkout page
   document.getElementById("checkout-btn")?.addEventListener("click", () => {
     if (studioCart.length === 0) return;
-    alert("Proceeding to secure checkout with Monroe Closet Studio.");
+    window.location.href = "checkout.html";
   });
 
   // Escape Key to close drawers
@@ -223,7 +223,7 @@ function addToCart(productId, qty = 1) {
       brand: product.brand,
       title: product.title,
       price: product.price,
-      image: (product.images && product.images[0]) || "img/monroe-logo.png",
+      image: (product.images && product.images[0]) || "",
       quantity: qty
     });
   }

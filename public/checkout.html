@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | MONROE CLOSET STUDIO</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" style="border-radius: 50%;" type="image/png" href="img/Monreo.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="checkout.css">
+</head>
+<body>
+
+  <!-- Minimal Header -->
+  <header class="studio-header" id="header">
+    <div class="header-container">
+
+      <button class="burger-btn" id="burger-menu" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="3" y1="7" x2="21" y2="7"/>
+          <line x1="3" y1="17" x2="21" y2="17"/>
+        </svg>
+      </button>
+
+      <nav class="nav-left" aria-label="Primary">
+        <ul class="nav-links">
+          <li class="nav-item has-dropdown">
+            <a href="shop.html" class="nav-anchor">Shop</a>
+            <div class="dropdown-panel mega-panel">
+              <div class="dropdown-inner">
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Clothing" class="col-heading">Clothing</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Clothing&sub=Outerwear">Outerwear</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Blazers">Blazers</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Dresses">Dresses</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Tops%2F%20T-shirts">Tops / T-shirts</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Shirts%2F%20Blouses">Shirts / Blouses</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Pants">Pants</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Jeans">Jeans</a></li>
+                    <li><a href="shop.html?category=Clothing&sub=Skirts">Skirts</a></li>
+                  </ul>
+                </div>
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Bags" class="col-heading">Bags</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Bags">All Handbags</a></li>
+                    <li><a href="shop.html?category=Bags">Shoulder & Crossbody</a></li>
+                    <li><a href="shop.html?category=Bags">Totes</a></li>
+                    <li><a href="shop.html?category=Bags">Clutches</a></li>
+                  </ul>
+                </div>
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Shoes" class="col-heading">Shoes</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Shoes">All Shoes</a></li>
+                    <li><a href="shop.html?category=Shoes">Heels & Pumps</a></li>
+                    <li><a href="shop.html?category=Shoes">Flats & Loafers</a></li>
+                    <li><a href="shop.html?category=Shoes">Boots & Sandals</a></li>
+                  </ul>
+                </div>
+                <div class="dropdown-col">
+                  <a href="shop.html?category=Accessories%20%2F%20jewelry" class="col-heading">Accessories & Jewelry</a>
+                  <ul class="sub-links">
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">All Accessories</a></li>
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">Fine Jewelry</a></li>
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">Timepieces</a></li>
+                    <li><a href="shop.html?category=Accessories%20%2F%20jewelry">Scarves & Belts</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="rental.html" class="nav-anchor">Archive Rental</a>
+            <div class="dropdown-panel simple-panel">
+              <ul class="simple-links">
+                <li><a href="rental.html">How Rental Works</a></li>
+                <li><a href="rental.html#collection">Rental Archive Lookbook</a></li>
+                <li><a href="rental.html#booking">Book a Private Fitting</a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="styling.html" class="nav-anchor">Private Styling</a>
+            <div class="dropdown-panel simple-panel">
+              <ul class="simple-links">
+                <li><a href="styling.html">Bespoke Styling Services</a></li>
+                <li><a href="styling.html#sourcing">Rare Holy-Grail Sourcing</a></li>
+                <li><a href="styling.html#inquire">Schedule Consultation</a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="about.html" class="nav-anchor">About Us</a>
+            <div class="dropdown-panel simple-panel">
+              <ul class="simple-links">
+                <li><a href="about.html">Monroe Studio Story</a></li>
+                <li><a href="about.html#consignment">Consign With Us</a></li>
+                <li><a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener">Instagram (@monroecloset.studio)</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <a href="index.html" class="brand-logo">
+        <span class="logo-title">MONROE</span>
+      </a>
+
+      <div class="nav-right">
+        <button class="icon-btn" id="search-btn" aria-label="Search">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="11" cy="11" r="7.5"/>
+            <path d="m20 20-3.8-3.8"/>
+          </svg>
+        </button>
+        <button class="icon-btn bag-btn" id="cart-btn" aria-label="Shopping Bag">
+          <span class="bag-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18"/><path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25"/><circle cx="18" cy="20" r="2"/><circle cx="8" cy="20" r="2"/></svg></span>
+          <span class="bag-count" id="cart-count">0</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- SEARCH DRAWER OVERLAY -->
+  <div class="search-drawer" id="search-modal">
+    <div class="search-drawer-inner">
+      <div class="search-top">
+        <input type="text" id="live-search-input" placeholder="Search archive..." autocomplete="off">
+        <button class="close-search-btn" id="close-search-btn" aria-label="Close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER BAG -->
+  <div class="cart-overlay" id="cart-drawer-backdrop">
+    <div class="cart-panel" id="cart-drawer">
+      <div class="cart-header">
+        <span class="cart-title">Shopping Bag (<span id="cart-drawer-count">0</span>)</span>
+        <button class="cart-close" id="close-cart-btn" aria-label="Close bag">✕</button>
+      </div>
+      <div class="cart-body" id="cart-items-container"></div>
+      <div class="cart-footer">
+        <div class="cart-total-line">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">CA$0.00</span>
+        </div>
+        <button class="checkout-button" id="checkout-btn">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div class="mobile-drawer-overlay" id="mobile-nav-backdrop">
+    <div class="mobile-drawer" id="mobile-nav-drawer">
+      <div class="mobile-top">
+        <span class="mobile-brand">MONROE</span>
+        <button class="mobile-close" id="close-mobile-nav-btn" aria-label="Close menu">✕</button>
+      </div>
+      <div class="mobile-menu-body">
+        <div class="mobile-accordion">
+          <button class="mobile-acc-header" id="mobile-shop-btn">
+            <span>Shop</span>
+            <span class="acc-arrow">+</span>
+          </button>
+          <div class="mobile-acc-panel" id="mobile-shop-content">
+            <div class="mobile-nested">
+              <button class="mobile-sub-acc-header" id="mobile-clothing-btn">
+                <span>Clothing</span>
+                <span class="acc-arrow">+</span>
+              </button>
+              <div class="mobile-sub-panel" id="mobile-clothing-content">
+                <a href="shop.html?category=Clothing&sub=Outerwear">Outerwear</a>
+                <a href="shop.html?category=Clothing&sub=Blazers">Blazers</a>
+                <a href="shop.html?category=Clothing&sub=Dresses">Dresses</a>
+                <a href="shop.html?category=Clothing&sub=Tops%2F%20T-shirts">Tops / T-shirts</a>
+                <a href="shop.html?category=Clothing&sub=Shirts%2F%20Blouses">Shirts / Blouses</a>
+                <a href="shop.html?category=Clothing&sub=Pants">Pants</a>
+                <a href="shop.html?category=Clothing&sub=Jeans">Jeans</a>
+                <a href="shop.html?category=Clothing&sub=Skirts">Skirts</a>
+              </div>
+            </div>
+            <a href="shop.html?category=Bags" class="mobile-plain-link">Bags</a>
+            <a href="shop.html?category=Shoes" class="mobile-plain-link">Shoes</a>
+            <a href="shop.html?category=Accessories%20%2F%20jewelry" class="mobile-plain-link">Accessories & Jewelry</a>
+          </div>
+        </div>
+        <a href="rental.html" class="mobile-root-link">Archive Rental</a>
+        <a href="styling.html" class="mobile-root-link">Private Styling</a>
+        <a href="about.html" class="mobile-root-link">About Us</a>
+        <div class="mobile-social">
+          <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener">@monroecloset.studio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CHECKOUT PAGE CONTENT (CANADA - EN)
+       ============================================================ -->
+  <main class="checkout-main">
+    <div class="container">
+
+      <!-- Breadcrumb -->
+      <nav class="checkout-breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span>/</span>
+        <a href="shop.html">Shop</a>
+        <span>/</span>
+        <span class="active-crumb">Checkout</span>
+      </nav>
+
+      <div class="checkout-page-header">
+        <span class="page-kicker">SECURE CHECKOUT — CANADA</span>
+        <h1 class="checkout-page-title">Order Summary</h1>
+      </div>
+
+      <!-- Empty state (shown when cart is empty) -->
+      <div class="checkout-empty" id="checkout-empty" style="display:none;">
+        <div class="checkout-empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18"/>
+            <path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25"/>
+            <circle cx="18" cy="20" r="2"/>
+            <circle cx="8" cy="20" r="2"/>
+          </svg>
+        </div>
+        <h2>Your Bag is Empty</h2>
+        <p>Explore the archival collection and add curated luxury pieces to your bag.</p>
+        <a href="shop.html" class="checkout-empty-cta">Explore The Archive →</a>
+      </div>
+
+      <!-- Main checkout layout -->
+      <div class="checkout-layout" id="checkout-layout" style="display:none;">
+
+        <!-- LEFT: Items List -->
+        <div class="checkout-items-col">
+          <div class="checkout-section-label">
+            <span>Archival Pieces</span>
+            <span class="checkout-items-count" id="checkout-items-count"></span>
+          </div>
+
+          <div class="checkout-items-list" id="checkout-items-list">
+            <!-- Rendered by checkout.js -->
+          </div>
+
+          <!-- Totals -->
+          <div class="checkout-totals">
+            <div class="checkout-total-row">
+              <span>Subtotal</span>
+              <span id="checkout-subtotal">CA$0.00</span>
+            </div>
+            <div class="checkout-total-row checkout-total-delivery">
+              <span>Delivery (Canada & International)</span>
+              <span class="checkout-delivery-note" id="checkout-delivery-cost">Calculated by shipping method</span>
+            </div>
+            <div class="checkout-total-row checkout-total-grand">
+              <span>Total (CAD)</span>
+              <span id="checkout-total">CA$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Contact & Shipping Form -->
+        <div class="checkout-form-col">
+          <div class="checkout-form-box">
+            <h2 class="checkout-form-title">Shipping & Payment</h2>
+            <p class="checkout-form-subtitle">Complete your order with secure Stripe checkout or concierge private arrangement.</p>
+
+            <form class="checkout-form" id="checkout-form" novalidate>
+              <div class="checkout-field">
+                <label for="checkout-name">Full Name <span class="req">*</span></label>
+                <input type="text" id="checkout-name" name="name" placeholder="Lauren Miller" required autocomplete="name">
+              </div>
+
+              <div class="checkout-field">
+                <label for="checkout-phone">Phone Number <span class="req">*</span></label>
+                <input type="tel" id="checkout-phone" name="phone" placeholder="+1 (416) 555-0192" required autocomplete="tel">
+              </div>
+
+              <div class="checkout-field">
+                <label for="checkout-email">Email Address <span class="req">*</span></label>
+                <input type="email" id="checkout-email" name="email" placeholder="lauren@example.com" required autocomplete="email">
+              </div>
+
+              <div class="checkout-field">
+                <label for="checkout-social">Instagram / Concierge Handle</label>
+                <input type="text" id="checkout-social" name="social_handle" maxlength="100" placeholder="@username" autocomplete="off">
+              </div>
+
+              <div class="checkout-field">
+                <label for="checkout-delivery">Shipping Method <span class="req">*</span></label>
+                <select id="checkout-delivery" name="delivery_method" required>
+                  <option value="canada_post_expedited" selected>Canada Post Expedited Parcel (3–5 business days)</option>
+                  <option value="canada_post_xpresspost">Canada Post Xpresspost (1–2 business days)</option>
+                  <option value="showroom_pickup">Studio Showroom Pickup (Toronto, ON — By Appointment)</option>
+                  <option value="international">Worldwide Express (DHL / FedEx International)</option>
+                </select>
+              </div>
+
+              <div class="checkout-field" id="field-address-group">
+                <label for="checkout-address" id="checkout-address-label">Street Address <span class="req">*</span></label>
+                <input type="text" id="checkout-address" name="address" placeholder="120 Queen St W, Suite 4B" required autocomplete="street-address">
+              </div>
+
+              <div class="checkout-field-row" id="field-city-prov-group">
+                <div class="checkout-field">
+                  <label for="checkout-city">City <span class="req">*</span></label>
+                  <input type="text" id="checkout-city" name="city" placeholder="Toronto" required autocomplete="address-level2">
+                </div>
+
+                <div class="checkout-field">
+                  <label for="checkout-province">Province <span class="req">*</span></label>
+                  <select id="checkout-province" name="province" required autocomplete="address-level1">
+                    <option value="ON" selected>Ontario (ON)</option>
+                    <option value="BC">British Columbia (BC)</option>
+                    <option value="QC">Quebec (QC)</option>
+                    <option value="AB">Alberta (AB)</option>
+                    <option value="MB">Manitoba (MB)</option>
+                    <option value="SK">Saskatchewan (SK)</option>
+                    <option value="NS">Nova Scotia (NS)</option>
+                    <option value="NB">New Brunswick (NB)</option>
+                    <option value="NL">Newfoundland & Labrador (NL)</option>
+                    <option value="PE">Prince Edward Island (PE)</option>
+                    <option value="NT">Northwest Territories (NT)</option>
+                    <option value="YT">Yukon (YT)</option>
+                    <option value="NU">Nunavut (NU)</option>
+                    <option value="OTHER">Other / International</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="checkout-field" id="field-postal-group">
+                <label for="checkout-postal" id="checkout-postal-label">Postal Code <span class="req">*</span></label>
+                <input type="text" id="checkout-postal" name="postal_code" placeholder="M5V 2Z3" required autocomplete="postal-code" maxlength="12">
+              </div>
+
+              <div class="checkout-field">
+                <label for="checkout-payment">Payment Method <span class="req">*</span></label>
+                <select id="checkout-payment" name="payment_method" required>
+                  <option value="stripe" selected>Credit Card / Apple Pay / Google Pay (Stripe)</option>
+                  <option value="interac">Interac e-Transfer (Direct Bank Transfer)</option>
+                  <option value="concierge">Studio Concierge (In-Person Fitting / Delivery)</option>
+                </select>
+              </div>
+
+              <div class="checkout-field">
+                <label for="checkout-notes">Order Notes & Fitting Instructions</label>
+                <textarea id="checkout-notes" name="notes" rows="3" placeholder="Special handling, sizing questions, preferred delivery schedule, etc."></textarea>
+              </div>
+
+              <button type="submit" class="checkout-submit-btn" id="checkout-submit-btn">
+                <span class="btn-text">Proceed to Checkout</span>
+                <span class="btn-loading" style="display:none;">
+                  <svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/></svg>
+                  Connecting to Stripe…
+                </span>
+              </button>
+
+              <div class="checkout-trust-badges">
+                <span>🔒 256-bit Encrypted</span>
+                <span>•</span>
+                <span>Stripe Verified</span>
+                <span>•</span>
+                <span>Canada Post Tracked</span>
+              </div>
+
+              <p class="checkout-disclaimer">
+                All archival sales are inspected and certified authentic by Monroe Closet Studio. Taxes and delivery calculated in CAD.
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success state (shown after order placed or Stripe return) -->
+      <div class="checkout-success" id="checkout-success" style="display:none;">
+        <div class="checkout-success-icon">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m8 12 3 3 5-6"/>
+          </svg>
+        </div>
+        <span class="page-kicker">ORDER CONFIRMED</span>
+        <h2 class="checkout-success-title">Thank You</h2>
+        <p class="checkout-success-lead">Your archival order <strong id="checkout-order-number"></strong> has been successfully placed.</p>
+        <p class="checkout-success-text">A confirmation email has been dispatched. Our studio concierge will contact you with tracking details and dispatch confirmation.</p>
+        <div class="checkout-success-actions">
+          <a href="shop.html" class="checkout-success-btn">Continue Exploring The Archive</a>
+          <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener" class="checkout-success-link">Connect with @monroecloset.studio on Instagram →</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MINIMAL FOOTER -->
+  <footer class="minimal-footer">
+    <div class="container">
+      <div class="footer-row">
+        <span>© 2026 MONROE CLOSET STUDIO — CANADA</span>
+        <div class="footer-nav">
+          <a href="shop.html">Shop</a>
+          <a href="rental.html">Archive Rental</a>
+          <a href="styling.html">Styling</a>
+          <a href="about.html">About Us</a>
+          <a href="https://www.instagram.com/monroecloset.studio" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-wrap" id="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="products-data.js"></script>
+  <script src="script.js"></script>
+  <script src="checkout.js"></script>
+</body>
+</html>
