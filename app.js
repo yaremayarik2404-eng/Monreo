@@ -124,13 +124,36 @@ app.get("/api/stripe-config", (req, res) => {
 const ownerEmail = (process.env.MAIN_USER || "yaremayarik2404@gmail.com").trim();
 const gmailPassword = (process.env.MAIN_PASSWORD || "").trim();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: ownerEmail,
-    pass: gmailPassword
+async function sendOrderEmail({ to, subject, html }) {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    console.warn("BREVO_API_KEY не задано — лист не відправлено");
+    return;
   }
-});
+
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "api-key": apiKey,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      sender: {
+        name: "Monreo",
+        email: process.env.MAIL_FROM || "no-reply@example.com",
+      },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Brevo API error (${res.status}): ${errText}`);
+  }
+}
 
 transporter.verify()
   .then(() => console.log("✅ Gmail SMTP підключено:", ownerEmail))
