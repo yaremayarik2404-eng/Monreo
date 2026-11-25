@@ -3,6 +3,9 @@ const express = require("express");
 const port = process.env.PORT || 3000;
 const app = express();
 const path = require("path");
+const nodemailer = require('nodemailer');
+const bodyParser = require('body-parser');
+const emailTemplate = require("./email")
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const isStripeConfigured = Boolean(
@@ -114,6 +117,115 @@ app.get("/api/stripe-config", (req, res) => {
   });
 });
 
+
+// =============================================================================
+// GMAIL NOTIFICATIONS (Nodemailer)
+// =============================================================================
+const ownerEmail = (process.env.MAIN_USER || "yaremayarik2404@gmail.com").trim();
+const gmailPassword = (process.env.MAIN_PASSWORD || "").trim();
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: ownerEmail,
+    pass: gmailPassword
+  }
+});
+
+transporter.verify()
+  .then(() => console.log("✅ Gmail SMTP підключено:", ownerEmail))
+  .catch((err) => console.error("❌ Помилка підключення Gmail SMTP:", err.message));
+
+// Endpoint to send luxury order / rental notifications
+async function handleSendOrderEmail(orderData, res) {
+  try {
+    const isRental = Boolean(
+      orderData.isRental ||
+      orderData.type === "rental" ||
+      orderData.rental_details
+    );
+    const orderRef = orderData.order_ref || orderData.orderRef || orderData.ref || "MCS-CA";
+    const customer = orderData.customer_name || orderData.name || "Клієнт";
+    const totalAmount = orderData.total_amount ?? orderData.totalAmount ?? "";
+    const totalFormatted = totalAmount !== "" ? ` (CA$${Number(totalAmount).toFixed(2)})` : "";
+
+    const subject = isRental
+      ? `[Monroe Archive] 📅 Новий запит на ОРЕНДУ: #${orderRef}${totalFormatted} — ${customer}`
+      : `[Monroe Archive] 🛍️ Нове замовлення: #${orderRef}${totalFormatted} — ${customer}`;
+
+    const mailOptions = {
+      from: `"Monroe Closet Studio" <${ownerEmail}>`,
+      to: "yaremayarik2404@gmail.com",
+      subject: subject,
+      text: emailTemplate.generateOrderText ? emailTemplate.generateOrderText(orderData) : JSON.stringify(orderData, null, 2),
+      html: emailTemplate(orderData)
+    };
+
+    console.log(`📩 Відправка email для замовлення #${orderRef} (${isRental ? "ОРЕНДА" : "КУПІВЛЯ"})...`);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email успішно надіслано на Gmail! Message ID:", info.messageId);
+
+    return res.status(200).json({
+      status: "OK",
+      message: "Order notification email successfully sent",
+      messageId: info.messageId
+    });
+  } catch (error) {
+    console.error("❌ Помилка при відправці email:", error.message);
+    return res.status(500).json({
+      status: "ERROR",
+      message: error.message
+    });
+  }
+}
+
+app.post("/api/send-order-email", async (req, res) => {
+  const orderData = req.body.order || req.body;
+  if (!orderData || typeof orderData !== "object") {
+    return res.status(400).json({ error: "No order payload provided" });
+  }
+  return handleSendOrderEmail(orderData, res);
+});
+
+app.post("/send", async (req, res) => {
+  console.log("📩 Запит /send отримано");
+  const payload = req.body;
+
+  // If order object is passed to /send
+  if (payload.order || (payload.customer_name && payload.items)) {
+    return handleSendOrderEmail(payload.order || payload, res);
+  }
+
+  // Fallback for simple message string
+  const message = payload.message || "Повідомлення від Monroe Closet Studio";
+  const mailOptions = {
+    from: `"Monroe Closet Studio" <${ownerEmail}>`,
+    to: "yaremayarik2404@gmail.com",
+    subject: "Monroe Closet Studio — Нове повідомлення",
+    text: typeof message === "string" ? message : JSON.stringify(message, null, 2),
+    html: emailTemplate(message)
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ SMTP response:", info.response);
+    res.status(200).json({
+      status: "OK",
+      message: "Email accepted by SMTP server",
+      messageId: info.messageId
+    });
+  } catch (error) {
+    console.error("❌ Помилка:", error.message);
+    res.status(500).json({
+      status: "ERROR",
+      message: error.message
+    });
+  }
+});
+
+
+
+// Start the server
 app.listen(port, () => {
-  console.log("Monroe Closet Studio server running on http://localhost:" + port);
+  console.log(`Server is running on http://localhost:${port}`);
 });

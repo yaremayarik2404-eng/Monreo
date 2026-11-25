@@ -155,8 +155,7 @@ function getStudioProducts() {
 }
 
 function getCurrencySymbol() {
-  const cur = (Array.isArray(window.MONROE_PRODUCTS) && window.MONROE_PRODUCTS[0]?.currency) || "UAH";
-  if (cur === "UAH") return " ₴";
+  const cur = (Array.isArray(window.MONROE_PRODUCTS) && window.MONROE_PRODUCTS[0]?.currency) || "$";
   if (cur === "USD") return "$";
   if (cur === "EUR") return "€";
   return ` ${cur}`;
@@ -672,8 +671,8 @@ const details = product.details || {};
             </button>
 
             ${product.rentalAvailable ? `
-              <a href="rental.html" class="btn-rent-minimal">
-                Rent for 3 Days — ${formatPrice(product.rentalPrice)}
+              <a href="checkout.html?mode=rental&productId=${encodeURIComponent(product.id)}" class="btn-rent-minimal">
+                Rent it
               </a>
             ` : ''}
 
@@ -923,11 +922,11 @@ function renderRentalFeatured() {
   const grid = document.getElementById("rental-featured-grid");
   if (!grid) return;
 
-  function formatPriceUah(price) {
+  function formatPriceCad(price) {
     if (price === null || price === undefined || price === "") return "";
     const num = Number(price);
     if (Number.isNaN(num)) return String(price);
-    return `${num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₴`;
+    return `${num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $`;
   }
 
   function renderRentalProducts(items) {
@@ -954,7 +953,7 @@ function renderRentalFeatured() {
         const title = product.title || "";
         const brand = product.brand || "";
         const imgAlt = `${brand} ${title}`.trim();
-        const rentPriceFormatted = formatPriceUah(product.rentalPrice);
+        const rentPriceFormatted = formatPriceCad(product.rentalPrice);
         const rentLabel = rentPriceFormatted ? `Rent from ${rentPriceFormatted} / 3 Days` : "";
         const productUrl = `product.html?id=${encodeURIComponent(product.id)}`;
 

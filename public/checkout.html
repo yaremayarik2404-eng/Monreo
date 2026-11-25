@@ -210,14 +210,23 @@
       <nav class="checkout-breadcrumb" aria-label="Breadcrumb">
         <a href="index.html">Home</a>
         <span>/</span>
-        <a href="shop.html">Shop</a>
+        <a href="shop.html" id="checkout-crumb-parent">Shop</a>
         <span>/</span>
-        <span class="active-crumb">Checkout</span>
+        <span class="active-crumb" id="checkout-crumb-active">Checkout</span>
       </nav>
 
       <div class="checkout-page-header">
-        <span class="page-kicker">SECURE CHECKOUT — CANADA</span>
-        <h1 class="checkout-page-title">Order Summary</h1>
+        <span class="page-kicker" id="checkout-kicker">SECURE CHECKOUT — CANADA</span>
+        <h1 class="checkout-page-title" id="checkout-title">Order Summary</h1>
+      </div>
+
+      <!-- Rental Mode Banner (shown when in rental mode) -->
+      <div class="checkout-rental-banner" id="checkout-rental-banner" style="display:none;">
+        <div class="rental-banner-content">
+          <span class="rental-banner-tag">ARCHIVE RENTAL</span>
+          <p class="rental-banner-text">You are reserving an archival museum piece for private rental. Select your fitting and event dates below.</p>
+        </div>
+        <a href="checkout.html" class="rental-banner-switch" id="rental-banner-switch">Switch to standard shopping bag</a>
       </div>
 
       <!-- Empty state (shown when cart is empty) -->
@@ -241,7 +250,7 @@
         <!-- LEFT: Items List -->
         <div class="checkout-items-col">
           <div class="checkout-section-label">
-            <span>Archival Pieces</span>
+            <span id="checkout-section-title">Archival Pieces</span>
             <span class="checkout-items-count" id="checkout-items-count"></span>
           </div>
 
@@ -249,14 +258,46 @@
             <!-- Rendered by checkout.js -->
           </div>
 
+          <!-- RENTAL SPECIFIC DATES & DURATION PICKER -->
+          <div class="checkout-rental-options" id="checkout-rental-options" style="display:none;">
+            <div class="rental-options-header">
+              <span class="rental-options-title">Rental Period & Dates</span>
+              <span class="rental-options-sub">Standard archival rental starts from 3 days</span>
+            </div>
+
+            <div class="rental-dates-grid">
+              <div class="rental-date-field">
+                <label for="rental-start-date">Start Date / Fitting <span class="req">*</span></label>
+                <input type="date" id="rental-start-date" name="rental_start_date" required>
+              </div>
+
+              <div class="rental-date-field">
+                <label for="rental-end-date">Return Date <span class="req">*</span></label>
+                <input type="date" id="rental-end-date" name="rental_end_date" required>
+              </div>
+            </div>
+
+            <div class="rental-summary-row">
+              <div class="rental-duration-pill" id="rental-duration-badge">3 Days Rental</div>
+              <div class="rental-calc-breakdown" id="rental-rate-breakdown">Calculating rental rates…</div>
+            </div>
+
+            <div class="rental-deposit-notice">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <span><strong>Archive Preservation & Deposit:</strong> Complimentary white-glove archival cleaning is included. A refundable security hold of CA$250 is placed at dispatch/fitting and released upon safe return.</span>
+            </div>
+          </div>
+
           <!-- Totals -->
           <div class="checkout-totals">
             <div class="checkout-total-row">
-              <span>Subtotal</span>
+              <span id="checkout-subtotal-label">Subtotal</span>
               <span id="checkout-subtotal">CA$0.00</span>
             </div>
             <div class="checkout-total-row checkout-total-delivery">
-              <span>Delivery (Canada & International)</span>
+              <span>Delivery / Showroom Collection</span>
               <span class="checkout-delivery-note" id="checkout-delivery-cost">Calculated by shipping method</span>
             </div>
             <div class="checkout-total-row checkout-total-grand">
@@ -269,10 +310,23 @@
         <!-- RIGHT: Contact & Shipping Form -->
         <div class="checkout-form-col">
           <div class="checkout-form-box">
-            <h2 class="checkout-form-title">Shipping & Payment</h2>
-            <p class="checkout-form-subtitle">Complete your order with secure Stripe checkout or concierge private arrangement.</p>
+            <h2 class="checkout-form-title" id="checkout-form-title">Shipping & Payment</h2>
+            <p class="checkout-form-subtitle" id="checkout-form-subtitle">Complete your order with secure Stripe checkout or concierge private arrangement.</p>
 
             <form class="checkout-form" id="checkout-form" novalidate>
+              <!-- RENTAL PURPOSE (Shown in rental mode) -->
+              <div class="checkout-field" id="field-rental-purpose-group" style="display:none;">
+                <label for="checkout-rental-purpose">Rental Purpose / Event Type <span class="req">*</span></label>
+                <select id="checkout-rental-purpose" name="rental_purpose">
+                  <option value="Editorial / Photoshoot" selected>Editorial / Photoshoot</option>
+                  <option value="Red Carpet / Gala / Film Festival">Red Carpet / Gala / Film Festival</option>
+                  <option value="Private Event / Wedding / Party">Private Event / Wedding / Party</option>
+                  <option value="Film / TV / Commercial Production">Film / TV / Commercial Production</option>
+                  <option value="Personal Styling & Wardrobe">Personal Styling & Wardrobe</option>
+                  <option value="Other Special Occasion">Other Special Occasion</option>
+                </select>
+              </div>
+
               <div class="checkout-field">
                 <label for="checkout-name">Full Name <span class="req">*</span></label>
                 <input type="text" id="checkout-name" name="name" placeholder="Lauren Miller" required autocomplete="name">
@@ -293,84 +347,32 @@
                 <input type="text" id="checkout-social" name="social_handle" maxlength="100" placeholder="@username" autocomplete="off">
               </div>
 
-              <div class="checkout-field">
-                <label for="checkout-delivery">Shipping Method <span class="req">*</span></label>
-                <select id="checkout-delivery" name="delivery_method" required>
-                  <option value="canada_post_expedited" selected>Canada Post Expedited Parcel (3–5 business days)</option>
-                  <option value="canada_post_xpresspost">Canada Post Xpresspost (1–2 business days)</option>
-                  <option value="showroom_pickup">Studio Showroom Pickup (Toronto, ON — By Appointment)</option>
-                  <option value="international">Worldwide Express (DHL / FedEx International)</option>
-                </select>
-              </div>
 
-              <div class="checkout-field" id="field-address-group">
-                <label for="checkout-address" id="checkout-address-label">Street Address <span class="req">*</span></label>
-                <input type="text" id="checkout-address" name="address" placeholder="120 Queen St W, Suite 4B" required autocomplete="street-address">
-              </div>
-
-              <div class="checkout-field-row" id="field-city-prov-group">
-                <div class="checkout-field">
-                  <label for="checkout-city">City <span class="req">*</span></label>
-                  <input type="text" id="checkout-city" name="city" placeholder="Toronto" required autocomplete="address-level2">
-                </div>
-
-                <div class="checkout-field">
-                  <label for="checkout-province">Province <span class="req">*</span></label>
-                  <select id="checkout-province" name="province" required autocomplete="address-level1">
-                    <option value="ON" selected>Ontario (ON)</option>
-                    <option value="BC">British Columbia (BC)</option>
-                    <option value="QC">Quebec (QC)</option>
-                    <option value="AB">Alberta (AB)</option>
-                    <option value="MB">Manitoba (MB)</option>
-                    <option value="SK">Saskatchewan (SK)</option>
-                    <option value="NS">Nova Scotia (NS)</option>
-                    <option value="NB">New Brunswick (NB)</option>
-                    <option value="NL">Newfoundland & Labrador (NL)</option>
-                    <option value="PE">Prince Edward Island (PE)</option>
-                    <option value="NT">Northwest Territories (NT)</option>
-                    <option value="YT">Yukon (YT)</option>
-                    <option value="NU">Nunavut (NU)</option>
-                    <option value="OTHER">Other / International</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="checkout-field" id="field-postal-group">
-                <label for="checkout-postal" id="checkout-postal-label">Postal Code <span class="req">*</span></label>
-                <input type="text" id="checkout-postal" name="postal_code" placeholder="M5V 2Z3" required autocomplete="postal-code" maxlength="12">
-              </div>
 
               <div class="checkout-field">
                 <label for="checkout-payment">Payment Method <span class="req">*</span></label>
                 <select id="checkout-payment" name="payment_method" required>
                   <option value="stripe" selected>Credit Card / Apple Pay / Google Pay (Stripe)</option>
-                  <option value="interac">Interac e-Transfer (Direct Bank Transfer)</option>
-                  <option value="concierge">Studio Concierge (In-Person Fitting / Delivery)</option>
+                  <option value="cash_on_delivery">Cash on delivery</option>
                 </select>
               </div>
 
               <div class="checkout-field">
-                <label for="checkout-notes">Order Notes & Fitting Instructions</label>
+                <label for="checkout-notes" id="checkout-notes-label">Order Notes & Fitting Instructions</label>
                 <textarea id="checkout-notes" name="notes" rows="3" placeholder="Special handling, sizing questions, preferred delivery schedule, etc."></textarea>
               </div>
 
               <button type="submit" class="checkout-submit-btn" id="checkout-submit-btn">
-                <span class="btn-text">Proceed to Checkout</span>
+                <span class="btn-text" id="checkout-submit-btn-text">Proceed to Checkout</span>
                 <span class="btn-loading" style="display:none;">
                   <svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/></svg>
                   Connecting to Stripe…
                 </span>
               </button>
 
-              <div class="checkout-trust-badges">
-                <span>🔒 256-bit Encrypted</span>
-                <span>•</span>
-                <span>Stripe Verified</span>
-                <span>•</span>
-                <span>Canada Post Tracked</span>
-              </div>
+             
 
-              <p class="checkout-disclaimer">
+              <p class="checkout-disclaimer" id="checkout-disclaimer">
                 All archival sales are inspected and certified authentic by Monroe Closet Studio. Taxes and delivery calculated in CAD.
               </p>
             </form>

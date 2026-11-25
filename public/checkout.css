@@ -462,17 +462,7 @@
   to { transform: rotate(360deg); }
 }
 
-.checkout-trust-badges {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-light, #777);
-  margin-top: 10px;
-}
+
 
 .checkout-disclaimer {
   font-size: 0.72rem;
@@ -593,6 +583,184 @@
   }
 }
 
+/* ==========================================================================
+   ARCHIVE RENTAL STYLES (MONROE CLOSET STUDIO)
+   ========================================================================== */
+.checkout-rental-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 24px;
+  background-color: #faf8f5;
+  border: 1px solid #ebdcb2;
+  margin-bottom: 36px;
+}
+
+.rental-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.rental-banner-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #111111;
+  color: #d4af37;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rental-banner-text {
+  font-size: 0.85rem;
+  color: #444444;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.rental-banner-switch {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-main, #111);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.rental-banner-switch:hover {
+  opacity: 0.6;
+}
+
+/* Rental Options Box */
+.checkout-rental-options {
+  margin-top: 32px;
+  padding: 24px 24px 26px;
+  background-color: #fafafa;
+  border: 1px solid var(--border, #eaeaea);
+}
+
+.rental-options-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border, #eaeaea);
+}
+
+.rental-options-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-main, #111);
+}
+
+.rental-options-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted, #777);
+}
+
+.rental-dates-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.rental-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rental-date-field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-main, #111);
+}
+
+.rental-date-field input[type="date"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border, #d8d8d8);
+  background-color: #ffffff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--text-main, #111);
+  border-radius: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.rental-date-field input[type="date"]:focus {
+  outline: none;
+  border-color: var(--text-main, #111);
+  box-shadow: 0 0 0 1px var(--text-main, #111);
+}
+
+.rental-summary-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  margin-bottom: 16px;
+}
+
+.rental-duration-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #111111;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rental-calc-breakdown {
+  font-size: 0.85rem;
+  color: var(--text-main, #222);
+  font-weight: 500;
+}
+
+.rental-deposit-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: #f7f9fa;
+  border: 1px solid #e2e8f0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #4a5568;
+}
+
+.checkout-item-badge-rent {
+  display: inline-block;
+  padding: 2px 6px;
+  background-color: #111111;
+  color: #d4af37;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
 @media (max-width: 640px) {
   .checkout-main {
     padding-bottom: 64px;
@@ -620,5 +788,10 @@
 
   .checkout-page-title {
     font-size: 2rem;
+  }
+
+  .rental-dates-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 }
