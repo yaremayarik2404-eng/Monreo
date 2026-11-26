@@ -315,7 +315,7 @@ const server = app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running on port ${port}`);
 });
 
-server.on("error", (err) => {
-  console.error("❌ Server listen error:", err);
+server.on("error", (error) => {
+  console.error("❌ Server listen error:", error);
   process.exit(1);
-});
+})
