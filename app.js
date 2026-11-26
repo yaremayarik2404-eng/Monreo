@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const emailTemplate = require("./email");
+const paidEmailTemplate = require("./emailPay")
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -20,10 +21,44 @@ const stripe = isStripeConfigured ? require("stripe")(stripeSecretKey) : null;
 // EMAIL SETUP (Brevo HTTP API)
 // =============================================================================
 const ownerEmail = (process.env.MAIN_USER || "yaremayarik2404@gmail.com").trim();
+const checkoutEmail = (process.env.CHECKOUT_EMAIL || ownerEmail).trim();
+const payEmail = (process.env.PAY_EMAIL || ownerEmail).trim();
 const mailFrom = (process.env.MAIL_FROM || ownerEmail).trim();
 const brevoApiKey = (process.env.BREVO_API_KEY || "").trim();
 
+function normalizeStage(payload = {}) {
+  const rawStage = String(
+    payload.stage || payload.action || payload.event || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  if (rawStage === "checkout" || rawStage === "proceed_to_checkout" || rawStage === "proceed-to-checkout") {
+    return "checkout";
+  }
+  if (rawStage === "pay" || rawStage === "payment") {
+    return "pay";
+  }
+  return "default";
+}
+
+function resolveRecipientEmail(payload = {}) {
+  const stage = normalizeStage(payload);
+  if (stage === "checkout") return checkoutEmail;
+  if (stage === "pay") return payEmail;
+  return ownerEmail;
+}
+
+function isPayStage(payload) {
+  if (!payload || typeof payload !== "object") return false;
+  const stage = String(payload.stage || "").trim().toLowerCase();
+  return stage === "pay" || payload.status === "paid_stripe";
+}
+
 function renderEmailHtml(payload) {
+  if (isPayStage(payload) && paidEmailTemplate && typeof paidEmailTemplate.renderPaidEmailHtml === "function") {
+    return paidEmailTemplate.renderPaidEmailHtml(payload);
+  }
   if (typeof emailTemplate === "function") {
     return emailTemplate(payload);
   }
@@ -36,6 +71,9 @@ function renderEmailHtml(payload) {
 }
 
 function renderEmailText(payload) {
+  if (isPayStage(payload) && paidEmailTemplate && typeof paidEmailTemplate.renderPaidEmailText === "function") {
+    return paidEmailTemplate.renderPaidEmailText(payload);
+  }
   if (emailTemplate && typeof emailTemplate.generateOrderText === "function") {
     return emailTemplate.generateOrderText(payload);
   }
@@ -83,6 +121,90 @@ async function sendOrderEmail({ to, subject, html, text }) {
   return res.json();
 }
 
+const sentPaidWebhookRefs = new Set();
+
+app.post(
+  "/api/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const webhookSecret = (process.env.STRIPE_WEBHOOK_SECRET || "").trim();
+    const signature = req.headers["stripe-signature"];
+
+    if (!stripe) {
+      return res.status(503).json({ error: "Stripe is not configured" });
+    }
+    if (!webhookSecret || !signature) {
+      return res.status(400).json({ error: "Missing webhook secret or stripe-signature header" });
+    }
+
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
+    } catch (err) {
+      console.error("❌ Stripe webhook signature error:", err.message);
+      return res.status(400).json({ error: `Webhook signature failed: ${err.message}` });
+    }
+
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      const orderRef =
+        session.client_reference_id ||
+        session.metadata?.order_ref ||
+        session.id;
+
+      if (!sentPaidWebhookRefs.has(orderRef)) {
+        sentPaidWebhookRefs.add(orderRef);
+
+        const amountTotal =
+          typeof session.amount_total === "number"
+            ? Number((session.amount_total / 100).toFixed(2))
+            : 0;
+
+        const paidPayload = {
+          order_ref: orderRef,
+          customer_name:
+            session.metadata?.customer_name ||
+            session.customer_details?.name ||
+            "Клієнт",
+          email:
+            session.customer_details?.email ||
+            session.customer_email ||
+            "",
+          phone:
+            session.metadata?.phone ||
+            session.customer_details?.phone ||
+            "",
+          delivery_method:
+            session.metadata?.delivery_method ||
+            "Stripe Checkout",
+          payment_method: "stripe",
+          status: "paid_stripe",
+          stage: "pay",
+          total_amount: amountTotal,
+          currency: (session.currency || "cad").toUpperCase(),
+          isRental: session.metadata?.is_rental === "true",
+          type: session.metadata?.is_rental === "true" ? "rental" : "purchase",
+        };
+
+        try {
+          await sendOrderEmail({
+            to: payEmail,
+            subject: `[Monroe Archive] 💳 (Pay) Оплату підтверджено: #${orderRef} (CA$${amountTotal.toFixed(2)})`,
+            html: renderEmailHtml(paidPayload),
+            text: renderEmailText(paidPayload),
+          });
+          console.log(`✅ Webhook надіслав лист оплати на ${payEmail} для #${orderRef}`);
+        } catch (err) {
+          sentPaidWebhookRefs.delete(orderRef);
+          console.error("❌ Помилка відправки листа з webhook:", err.message);
+          return res.status(500).json({ error: "Failed to send paid notification email" });
+        }
+      }
+    }
+
+    return res.status(200).json({ received: true });
+  }
+);
 // =============================================================================
 // MIDDLEWARE & STATIC PAGES
 // =============================================================================
@@ -197,8 +319,19 @@ app.get("/api/stripe-config", (req, res) => {
 // =============================================================================
 // ORDER NOTIFICATIONS (Brevo API)
 // =============================================================================
-async function handleSendOrderEmail(orderData, res) {
+async function handleSendOrderEmail(orderData, res, explicitStage = "") {
   try {
+    const stage = normalizeStage({
+      stage: explicitStage || orderData.stage || orderData.action || orderData.event,
+    });
+    const recipientEmail = resolveRecipientEmail({ stage });
+    const stageLabel =
+      stage === "checkout"
+        ? "Proceed to checkout"
+        : stage === "pay"
+          ? "Pay"
+          : "Order";
+
     const isRental = Boolean(
       orderData.isRental ||
       orderData.type === "rental" ||
@@ -213,18 +346,23 @@ async function handleSendOrderEmail(orderData, res) {
         : "";
 
     const subject = isRental
-      ? `[Monroe Archive] 📅 Новий запит на ОРЕНДУ: #${orderRef}${totalFormatted} — ${customer}`
-      : `[Monroe Archive] 🛍️ Нове замовлення: #${orderRef}${totalFormatted} — ${customer}`;
+      ? `[Monroe Archive] 📅 (${stageLabel}) Новий запит на ОРЕНДУ: #${orderRef}${totalFormatted} — ${customer}`
+      : `[Monroe Archive] 🛍️ (${stageLabel}) Нове замовлення: #${orderRef}${totalFormatted} — ${customer}`;
 
-    const htmlBody = renderEmailHtml(orderData);
-    const textBody = renderEmailText(orderData);
+    const payloadForTemplate = {
+      ...orderData,
+      stage,
+    };
+
+    const htmlBody = renderEmailHtml(payloadForTemplate);
+    const textBody = renderEmailText(payloadForTemplate);
 
     console.log(
-      `📩 Відправка email для замовлення #${orderRef} (${isRental ? "ОРЕНДА" : "КУПІВЛЯ"})...`
+      `📩 Відправка email [${stageLabel}] на ${recipientEmail} для замовлення #${orderRef} (${isRental ? "ОРЕНДА" : "КУПІВЛЯ"})...`
     );
 
     const info = await sendOrderEmail({
-      to: ownerEmail,
+      to: recipientEmail,
       subject,
       html: htmlBody,
       text: textBody,
@@ -234,6 +372,8 @@ async function handleSendOrderEmail(orderData, res) {
       return res.status(200).json({
         status: "OK",
         skipped: true,
+        stage,
+        recipient: recipientEmail,
         message: "Email skipped because BREVO_API_KEY is not configured",
       });
     }
@@ -241,6 +381,8 @@ async function handleSendOrderEmail(orderData, res) {
     console.log("✅ Email успішно надіслано через Brevo! Message ID:", info?.messageId || "");
     return res.status(200).json({
       status: "OK",
+      stage,
+      recipient: recipientEmail,
       message: "Order notification email successfully sent",
       messageId: info?.messageId || null,
     });
@@ -254,26 +396,30 @@ async function handleSendOrderEmail(orderData, res) {
 }
 
 app.post("/api/send-order-email", async (req, res) => {
-  const orderData = req.body?.order || req.body;
+  const body = req.body || {};
+  const orderData = body.order && typeof body.order === "object" ? body.order : body;
   if (!orderData || typeof orderData !== "object") {
     return res.status(400).json({ error: "No order payload provided" });
   }
-  return handleSendOrderEmail(orderData, res);
+  const explicitStage = body.stage || body.action || body.event || "";
+  return handleSendOrderEmail(orderData, res, explicitStage);
 });
 
 app.post("/send", async (req, res) => {
   console.log("📩 Запит /send отримано");
   const payload = req.body || {};
+  const explicitStage = payload.stage || payload.action || payload.event || "";
 
   if (payload.order || (payload.customer_name && payload.items)) {
-    return handleSendOrderEmail(payload.order || payload, res);
+    return handleSendOrderEmail(payload.order || payload, res, explicitStage);
   }
 
+  const recipientEmail = resolveRecipientEmail(payload);
   const message = payload.message || "Повідомлення від Monroe Closet Studio";
 
   try {
     const info = await sendOrderEmail({
-      to: ownerEmail,
+      to: recipientEmail,
       subject: "Monroe Closet Studio — Нове повідомлення",
       html: renderEmailHtml(message),
       text: renderEmailText(message),
@@ -282,6 +428,7 @@ app.post("/send", async (req, res) => {
     console.log("✅ Brevo response:", info?.messageId || "OK");
     return res.status(200).json({
       status: "OK",
+      recipient: recipientEmail,
       message: info?.skipped ? "Email skipped (no BREVO_API_KEY)" : "Email sent via Brevo",
       messageId: info?.messageId || null,
     });
@@ -318,4 +465,4 @@ const server = app.listen(port, "0.0.0.0", () => {
 server.on("error", (error) => {
   console.error("❌ Server listen error:", error);
   process.exit(1);
-})
+});

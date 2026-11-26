@@ -901,23 +901,26 @@
   // 9. DISPATCH GMAIL EMAIL NOTIFICATION
   // =========================================================================
 
-  async function sendOrderNotificationEmail(orderPayload) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
-      const res = await fetch(BACKEND_EMAIL_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order: orderPayload }),
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      return await res.json();
-    } catch (err) {
-      console.warn("Could not dispatch email notification:", err);
-      return null;
-    }
+  async function sendOrderNotificationEmail(orderPayload, stage = "checkout") {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch(BACKEND_EMAIL_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stage,
+        order: Object.assign({}, orderPayload, { stage }),
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return await res.json();
+  } catch (err) {
+    console.warn("Could not dispatch email notification:", err);
+    return null;
   }
+}
 
   // =========================================================================
   // 10. STRIPE CHECKOUT API
@@ -1172,9 +1175,10 @@
       if (saved && saved.payload) {
         const confirmedPayload = Object.assign({}, saved.payload, {
           status: "paid_stripe",
+          stage: "pay",
           notes: `${saved.payload.notes || ""} | Stripe Payment Confirmed`
         });
-        await sendOrderNotificationEmail(confirmedPayload);
+        await sendOrderNotificationEmail(confirmedPayload, "pay");
       }
       showSuccessScreen(ref ? `#${ref}` : "CONFIRMED", {
         isRental: isRentalMode || Boolean(ref && ref.includes("RENT")),
